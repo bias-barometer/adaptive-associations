@@ -34,6 +34,26 @@ var informed_consent = {
   }
 };
 
+// SCREEN: Instructions
+var instruction_experiment = {
+  type: "html-keyboard-response", // text + keyboard response
+  stimulus: // text to display
+  "<p>Please read this carefully, " + 
+  "as it will tell you what to do next. </p>" + 
+    "<p> On the screen you will see one word. For example the word 'Disney'. </p>" +
+    "<p> We want you to write down your <b> first </b> thought or association with that word. " +
+    "When you are done you can continue to the next word by pressing the <b>'Continue'-button </b> or " +
+    "by pressing the <b>'Enter'-key</b>. </p>" + 
+    "<p> Press [SPACE] for your first example. </p>",
+  choices: ["space"], // only proceed when the spacebar is pressed
+  trial_duration: null, // set to infinite length
+  data: {data_type: "instruction"}, // for sub-sequent data selection
+  on_load: function() {
+    // Remove progress bar from screen
+    document.getElementById("jspsych-progressbar-container").style.visibility = "hidden";
+  }
+};
+
 // EXPERIMENT
 // Add all screens to the timeline
 timeline.push(informed_consent);
