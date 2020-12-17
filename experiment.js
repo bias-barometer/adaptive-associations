@@ -70,7 +70,7 @@ var practice_trial_no_time = {
   }
 };
 
-// SCREEN: Instructions
+// SCREEN: Instructions - Timer
 var instruction_timer = {
   type: "html-keyboard-response", // text + keyboard response
   stimulus: // text to display
@@ -142,9 +142,9 @@ var practice_trial_timed = {
       
     } // END update_timer LOOP 
   } // END on_load function
-} // END trial
+}; // END trial
 
-// TIMELINE: random trials
+// TIMELINE: pratice trials
 var timeline_practice_timed = {
   timeline: [practice_trial_timed], // show the practice trials
   timeline_variables: [
@@ -157,7 +157,34 @@ var timeline_practice_timed = {
   ], 
   data: {data_type: "practice"},
   randomize_order: false
-} // END all_trials
+}; // END all_trials
+
+// SCREEN: Instruction - Accuracy
+var instruction_accuracy = {
+  type: "html-keyboard-response", // text + keyboard response
+  stimulus: // text to display
+  "<p> In the previous examples you praticed with typing at a higher speed. </p>" +
+  "<p> In this experiment we want you to be both <b> fast </b> & <b> accurate </b>. " +
+  "But what do we mean with 'accurate'? </p>" +
+  "<p> It means that we want valuable responses from you that we can present to others. " +
+  "This includes <b> best practices </b> such as: </p> " +
+  "<ul>" +
+      "<li>" + "Preventing typing errors" +
+      "<li>" + "Typing real words" +
+      "<li>" + "<b>No</b> keyboard bashing (asdahsiudaisdya)" +
+      "<li>" + "Preventing repeated answers" + 
+  "</ul>" + 
+  "<p> Press [SPACE] to see some examples of (in)accurate answers. </p>",
+  choices: ["space"], // only proceed when the spacebar is pressed
+  trial_duration: null, // set to infinite length
+  data: {data_type: "instruction"}, // for sub-sequent data selection
+  // TIMER
+  // Visibility
+  on_load: function() {
+    // Hide progress bar on screen
+    document.getElementById("jspsych-progressbar-container").style.visibility = "hidden";
+  }
+};
 
 // EXPERIMENT
 // Add all screens to the timeline
@@ -165,7 +192,8 @@ var timeline_practice_timed = {
 // timeline.push(instruction_experiment);
 // timeline.push(practice_trial_no_time);
 // timeline.push(instruction_timer);
-timeline.push(timeline_practice_timed);
+// timeline.push(timeline_practice_timed);
+timeline.push(instruction_accuracy);
 
 // Initialize the experiment
 jsPsych.init({
