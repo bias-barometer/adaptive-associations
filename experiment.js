@@ -1,6 +1,5 @@
 // EXPERIMENT STRUCTURE
     // Informed Consent
-    // Welcome
     // Instructions - Paradigm
     // Pratice Trials
     // Instructions - Valid Answers
@@ -28,12 +27,17 @@ var informed_consent = {
   "<p> -- Informed Consent Text --- </p>" +
   "<p> If you agree with these conditions press [SPACE] to continue </p>",
   choices: ["space"], // only proceed when the spacebar is pressed
-  data: {data_type: "informed_consent"} // for sub-sequent data selection
+  data: {data_type: "informed_consent"}, // for sub-sequent data selection
+  on_load: function() {
+    // Remove progress bar from screen
+    document.getElementById("jspsych-progressbar-container").style.visibility = "hidden";
+  }
 };
 
 // EXPERIMENT
 // Add all screens to the timeline
 timeline.push(informed_consent);
+timeline.push(instruction_experiment);
 
 // Initialize the experiment
 jsPsych.init({
