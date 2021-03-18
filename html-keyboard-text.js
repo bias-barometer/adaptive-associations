@@ -168,6 +168,8 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
         stimulus: trial.stimulus,
         final_response: visible_responses.join(""),
         responses: JSON.stringify(all_responses),
+        // Keep track of actions outside the experiment window
+        interactions: jsPsych.data.getInteractionData().json(),
       };
 
       // move on to the next trial and save the data
