@@ -60,10 +60,10 @@ var instruction_experiment = {
 var practice_trials = {
   // Custom plugin
   type: "html-keyboard-text",
-  stimulus: "TEST",
-  response_keys: ["ALL_KEYS"],
+  stimulus: "PROMPT",
+  response_keys: jsPsych.ALL_KEYS,
   trial_duration: null,
-  end_trial_keys: ["Enter"],
+  end_trial_key: "Enter", // add as string for proper validation
 }; // END trial
 
 // TIMELINE: pratice trials
@@ -92,4 +92,10 @@ jsPsych.init({
   timeline: timeline,
   // Allow all case responses
   case_sensitive_responses: false,
+  // DEBUG
+  // Show data on screen after finishing
+
+  on_finish: function () {
+    jsPsych.data.displayData();
+  },
 });
