@@ -54,6 +54,15 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
         description:
           "The key the subject is allowed to press to end the trial.",
       },
+      // Show practice instructions
+      show_instructions: {
+        type: jsPsych.plugins.parameterType.BOOL,
+        // Defaults to trials without instructions
+        default: false,
+        pretty_name: "Show Instructions",
+        description:
+          "Whether or not to show a line of instructions about what to do.",
+      },
     },
   };
 
@@ -87,13 +96,22 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
 
     // Display the instruction so that participants know which
     // key to press to continue to the next trial.
-    continue_html =
-      "<div id='html-keyboard-text-continue'>" +
-      "Press <b>" +
-      trial.end_trial_key +
-      "</b> to continue" +
-      "</div><br>";
-
+    if (trial.show_instructions) {
+      continue_html =
+        "<div id='html-keyboard-text-continue'>" +
+        "<p><i> Start typing your response on the keyboard </i> <br>" +
+        "Press <b>" +
+        trial.end_trial_key +
+        "</b> to continue </p>" +
+        "</div><br>";
+    } else {
+      continue_html =
+        "<div id='html-keyboard-text-continue'>" +
+        "Press <b>" +
+        trial.end_trial_key +
+        "</b> to continue" +
+        "</div><br>";
+    }
     // Combine all elements and show on screen
     display_element.innerHTML = stimulus_html + response_html + continue_html;
 
