@@ -142,8 +142,22 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
       // PROCESS RESPONSE
       if (jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
         // Signal the end of the trial when the designated key is pressed
-        // Custom function
-        end_trial();
+        // Ensure that correct answer is given
+        var valid_response = validate_response();
+
+        if (valid_response) {
+          // End the trial because a valid response was given
+          end_trial();
+        } else {
+          // Provide an alert message to indicate the need for a valid response
+          display_element.querySelector(
+            "#html-keyboard-text-continue"
+          ).innerHTML =
+            "Press <b>" +
+            trial.end_trial_key +
+            "</b> to continue" +
+            "<p> Your answer must be 1 or 2 words and at least 2 characters </p>";
+        }
       } else if (jsPsych.pluginAPI.compareKeys(info.key, "space")) {
         // A spacebar press should be converted to an empty space
         visible_responses.push(" ");
@@ -161,6 +175,48 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
         show_response();
       }
     } // END update_response FUNCTION
+
+    // ANSWER VALIDATION
+    // An answer may only be submitted if:
+    // It contains one to two words
+    // Each word contains more than two characters
+    function validate_response() {
+      // CLEAN ANSWER
+      // Get the total answer string
+      var answer = visible_responses.join("");
+      // Clean double spaces, tabs, etc.
+      // Replace everything that is more than one space with one space
+      answer = answer.replace(/\s+/g, " ");
+
+      // N WORDS
+      // Detect the number of words that are left when the string is split by spaces
+      var n_words = answer.split(" ").length;
+
+      // N CHARACTERS
+      // Detect the number of characters per word
+      // Extract each word seperately
+      var words = answer.split(" ");
+      // Initialize
+      var n_characters_per_word = [];
+
+      // Loop over words
+      for (var w in words) {
+        // Store the number of characters in each word
+        n_characters_per_word.push(words[w].length);
+      }
+
+      // Determine the minimum number of characters in a word
+      // NOTE: for applying Math.min to an array the three ... are necessary
+      n_characters = Math.min(...n_characters_per_word);
+
+      // VALIDATION
+      // Return a boolean to state whether the answer is valid or not
+      if (((n_words == 1) | (n_words == 2)) & (n_characters >= 2)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     // END TRIAL
     // End everything that might have been going on
