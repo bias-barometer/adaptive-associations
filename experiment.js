@@ -60,14 +60,14 @@ var instruction_experiment = {
 var practice_trials = {
   // Custom plugin
   type: "html-keyboard-text",
-  stimulus: "PROMPT",
+  stimulus: jsPsych.timelineVariable("target_word"),
   response_keys: jsPsych.ALL_KEYS,
   trial_duration: null,
   end_trial_key: "Enter", // add as string for proper validation
 }; // END trial
 
 // TIMELINE: pratice trials
-var timeline_practice_timed = {
+var timeline_practice = {
   timeline: [practice_trials], // show the practice trials
   timeline_variables: [
     { target_word: "car" },
@@ -83,7 +83,7 @@ var timeline_practice_timed = {
 // Add all screens to the timeline
 // timeline.push(informed_consent);
 // timeline.push(instruction_experiment);
-timeline.push(practice_trials);
+timeline.push(timeline_practice);
 
 // INITIALIZE EXPERIMENT
 // (Required)
