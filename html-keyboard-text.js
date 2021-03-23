@@ -76,6 +76,35 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
     var all_responses = [];
     // Keep track of the string that should be visualized on screen
     var visible_responses = [];
+    // Define the available keyboard keys. To discourage the use of other keys the rest is not visualized
+    var available_keys = [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+    ];
 
     // CREATE SCREEN
     // We want to create mulitple elements to be visualized on screen
@@ -138,7 +167,6 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
       // SAVE RESPONSE
       // Save the pressed key and the response time
       all_responses.push(info);
-
       // PROCESS RESPONSE
       if (jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
         // Signal the end of the trial when the designated key is pressed
@@ -158,14 +186,14 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
             "</b> to continue" +
             "<p> Your answer must be 1 or 2 words and at least 2 characters </p>";
         }
-      } else if (jsPsych.pluginAPI.compareKeys(info.key, "space")) {
-        // A spacebar press should be converted to an empty space
-        visible_responses.push(" ");
       } else if (jsPsych.pluginAPI.compareKeys(info.key, "backspace")) {
-        // Remove the last letter enterred to resemble a backspace action
+        // Remove the last letter entered to resemble a backspace action
         visible_responses.pop();
-      } else {
-        // A normal letter was pressed that should be visualized
+      } else if (
+        available_keys.includes(info.key) |
+        jsPsych.pluginAPI.compareKeys(info.key, " ")
+      ) {
+        // A normal letter or the spacebar was pressed that should be visualized
         visible_responses.push(info.key);
       } // END IF
 
