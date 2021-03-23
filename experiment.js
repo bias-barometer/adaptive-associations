@@ -37,7 +37,7 @@ var instructions = {
   type: "instructions",
   pages: [
     // Welcome
-    "<p> Welcome to the Free Associations Game </p>" +
+    "<p> Welcome to the Free Associations ... </p>" +
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
@@ -45,9 +45,9 @@ var instructions = {
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
-    "<p> Chocolate </p>" +
+    "<p> For example, what are you thinking about after reading the word: </p>" +
       "<br>" +
-      "<p> What are you thinking about after reading this word? </p>" +
+      "<p> Chocolate </p>" +
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
@@ -55,11 +55,11 @@ var instructions = {
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
-    "<p> Let's show you what that will look like: " +
+    "<p> Let's show you what the Free Associations ... looks like: " +
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
-    "<p> Chocolate </p>" +
+    "<p> <b>Chocolate </b> </p>" +
       "<p><i> This is the word we want you to read </i></p>" +
       "<br>" +
       "<p> _ </p>" +
@@ -70,22 +70,23 @@ var instructions = {
     //
     "<p> What should a response look like? </p>" +
       "<br>" +
-      "<p> One or two words" +
-      "<p> UPPERCASE or lowercase letters" +
-      "<p> More than two characters" +
-      "<p> Correct typing errors with the <b> backspace </b> </p>" +
+      "<p> You can only use lowercase letters (a-z) </p>" +
+      "<p> Use the <b> backspace </b> to correct typing errors </p>" +
+      "<br>" +
+      "<p> Only type 1 or 2 words (no sentences) </p>" +
+      "<p> Each word should contain more than 2 characters (no 'a' or 'an') </p>" +
       "<br>" +
       "<p> Press <b> Enter </b> to continue",
     //
-    "<p> Are you ready to practice? Let's try! </p>" +
+    "<p> Are you ready to practice? Let's give it a try! </p>" +
       "<br>" +
-      "<p> Press <b> Enter </b> to practice",
+      "<p> Press <b> Enter </b> for 3 practice words",
   ],
   key_forward: "Enter",
 };
 
-// SCREEN: Practice
-var practice_trials = {
+// SCREEN: Trial
+var trial = {
   // Custom plugin
   type: "html-keyboard-text",
   // Get stimulus content from timeline variable
@@ -102,7 +103,7 @@ var practice_trials = {
 
 // TIMELINE: pratice trials
 var timeline_practice = {
-  timeline: [practice_trials], // show the practice trials
+  timeline: [trial], // show the trials
   timeline_variables: [
     { target_word: "Chocolate", show_instructions: true },
     { target_word: "Bike", show_instructions: true },
@@ -112,12 +113,32 @@ var timeline_practice = {
   randomize_order: false,
 }; // END all_trials
 
+// SCREEN: Start Experiment
+var instructions_start = {
+  type: "instructions",
+  pages: [
+    // Welcome
+    "<p> Well done! You are now ready for the real deal. </p>" +
+      "<br>" +
+      "<p> Remember: </p>" +
+      "<br>" +
+      "<p> You can only use lowercase letters (a-z) </p>" +
+      "<p> Use the <b> backspace </b> to correct typing errors </p>" +
+      "<br>" +
+      "<p> Only type 1 or 2 words (no sentences) </p>" +
+      "<p> Each word should contain more than 2 characters (no 'a' or 'an') </p>" +
+      "<br>" +
+      "<p> Press <b> Enter </b> to get started",
+  ],
+};
+
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
-// timeline.push(informed_consent);
-// timeline.push(instructions);
+timeline.push(informed_consent);
+timeline.push(instructions);
 timeline.push(timeline_practice);
+timeline.push(instructions_start);
 
 // INITIALIZE EXPERIMENT
 // (Required)
