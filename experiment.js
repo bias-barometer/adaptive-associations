@@ -115,8 +115,8 @@ var timeline_practice = {
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
-// timeline.push(informed_consent);
-// timeline.push(instructions);
+timeline.push(informed_consent);
+timeline.push(instructions);
 timeline.push(timeline_practice);
 
 // INITIALIZE EXPERIMENT
@@ -126,9 +126,13 @@ jsPsych.init({
   timeline: timeline,
   // Allow all case responses
   case_sensitive_responses: false,
+  // Exclude users with a too small browser window,
+  exclusions: {
+    min_width: 800,
+    min_height: 600,
+  },
   // DEBUG
   // Show data on screen after finishing
-
   on_finish: function () {
     jsPsych.data.displayData();
   },
