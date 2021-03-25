@@ -2,16 +2,8 @@
 // Informed Consent
 // Instructions - Paradigm
 // Pratice Trials
-// Instructions - Valid Answers
-// Examples (in)valid Answers
+// Instructions - Getting Started
 // Association Trials
-// Adaptive Timer
-// Answer Validation
-// Data
-// Reaction Times
-// Keystrokes
-// Error corrections
-// Feedback / End-of-Experiment
 
 // SET-UP
 // Initialize timeline variable (required)
@@ -116,6 +108,7 @@ var timeline_practice = {
 // SCREEN: Start Experiment
 var instructions_start = {
   type: "instructions",
+  key_forward: "Enter",
   pages: [
     // Welcome
     "<p> Well done! You are now ready for the real deal. </p>" +
@@ -132,6 +125,24 @@ var instructions_start = {
   ],
 };
 
+// TIMELINE: experiment trials
+var timeline_experiment = {
+  timeline: [trial], // show the trials
+  timeline_variables: [
+    { target_word: "Male", show_instructions: false },
+    { target_word: "Female", show_instructions: false },
+    { target_word: "Gay", show_instructions: false },
+    { target_word: "Lesbian", show_instructions: false },
+    { target_word: "Asian", show_instructions: false },
+    { target_word: "Black", show_instructions: false },
+    { target_word: "Politician", show_instructions: false },
+    { target_word: "Lawyer", show_instructions: false },
+  ],
+  data: { data_type: "experiment" },
+  randomize_order: true, // randomize the trials
+  repetitions: 2, // present each trial twice.
+}; // END all_trials
+
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
@@ -139,6 +150,7 @@ timeline.push(informed_consent);
 timeline.push(instructions);
 timeline.push(timeline_practice);
 timeline.push(instructions_start);
+timeline.push(timeline_experiment);
 
 // INITIALIZE EXPERIMENT
 // (Required)
