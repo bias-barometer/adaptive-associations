@@ -141,8 +141,13 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
         "</b> to continue" +
         "</div><br>";
     }
+
+    // Display the answer feedback in case a wrong answer is provided
+    feedback_html = "<div id='html-keyboard-text-feedback'>" + "" + "</div>";
+
     // Combine all elements and show on screen
-    display_element.innerHTML = stimulus_html + response_html + continue_html;
+    display_element.innerHTML =
+      stimulus_html + response_html + continue_html + feedback_html;
 
     // SHOW RESPONSE
     // Everytime the participant presses a key, the response_html should be updated
@@ -173,19 +178,15 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
         // Ensure that correct answer is given
         var valid_response = validate_response();
 
-        if (valid_response) {
+        if (valid_response.valid) {
           // End the trial because a valid response was given
           end_trial();
         } else {
           // Provide an alert message to indicate the need for a valid response
           display_element.querySelector(
-            "#html-keyboard-text-continue"
-          ).innerHTML =
-            "Press <b>" +
-            trial.end_trial_key +
-            "</b> to continue" +
-            "<p> Your answer must be 1 or 2 words and at least 2 characters </p>";
-        }
+            "#html-keyboard-text-feedback"
+          ).innerHTML = "<i>" + valid_response.message + "</i>";
+        } // END IF validate response
       } else if (jsPsych.pluginAPI.compareKeys(info.key, "backspace")) {
         // Remove the last letter entered to resemble a backspace action
         visible_responses.pop();
@@ -215,10 +216,16 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
       // Clean double spaces, tabs, etc.
       // Replace everything that is more than one space with one space
       answer = answer.replace(/\s+/g, " ");
+      // Remove any leading or trailing spaces
+      answer = answer.trim();
 
       // N WORDS
       // Detect the number of words that are left when the string is split by spaces
-      var n_words = answer.split(" ").length;
+      if (answer == "") {
+        var n_words = 0;
+      } else {
+        var n_words = answer.split(" ").length;
+      }
 
       // N CHARACTERS
       // Detect the number of characters per word
@@ -238,12 +245,41 @@ jsPsych.plugins["html-keyboard-text"] = (function () {
       n_characters = Math.min(...n_characters_per_word);
 
       // VALIDATION
-      // Return a boolean to state whether the answer is valid or not
-      if (((n_words == 1) | (n_words == 2)) & (n_characters >= 2)) {
-        return true;
-      } else {
-        return false;
-      }
+      // The answer should have the correct numbers of words (1 - 2)
+      // AND
+      // The correct number of characters in each word
+
+      if ((n_words == 1) | (n_words == 2)) {
+        // Correct number of words - check characters
+        if (n_characters >= 2) {
+          // VALID answers
+          validation = {
+            valid: true,
+            message: "", // no feedback to display
+          };
+        } else {
+          // Insufficient number of characters
+          validation = {
+            valid: false,
+            message: "Each word must have more than 2 characters.", // display feedback
+          };
+        }
+      } else if (n_words == 0) {
+        // Insufficient number of words
+        validation = {
+          valid: false,
+          message: "Your answer is too short, it must contain 1 or 2 words.", // display feedback
+        };
+      } else if (n_words > 2) {
+        // Too many words
+        validation = {
+          valid: false,
+          message:
+            "Your answer must contain 1 or 2 words. Use <b> backspace </b> to shorten your answer.", // display feedback
+        };
+      } // END IF n_words
+
+      return validation;
     }
 
     // END TRIAL

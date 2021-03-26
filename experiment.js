@@ -146,11 +146,11 @@ var timeline_experiment = {
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
-timeline.push(informed_consent);
-timeline.push(instructions);
+// timeline.push(informed_consent);
+// timeline.push(instructions);
 timeline.push(timeline_practice);
-timeline.push(instructions_start);
-timeline.push(timeline_experiment);
+// timeline.push(instructions_start);
+// timeline.push(timeline_experiment);
 
 // INITIALIZE EXPERIMENT
 // (Required)
