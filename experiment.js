@@ -143,14 +143,23 @@ var timeline_experiment = {
   repetitions: 2, // present each trial twice.
 }; // END all_trials
 
+var test = {
+  type: "canvas-keys",
+  trial_target: "TEST",
+  canvas_size_target: [500, 500], // default
+  trial_lives: 10,
+  canvas_size_lives: [100, 500],
+};
+
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
 // timeline.push(informed_consent);
 // timeline.push(instructions);
-timeline.push(timeline_practice);
+// timeline.push(timeline_practice);
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
+timeline.push(test);
 
 // INITIALIZE EXPERIMENT
 // (Required)
