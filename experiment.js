@@ -149,6 +149,7 @@ var test = {
   canvas_size_target: [500, 500], // default
   trial_lives: 10,
   canvas_size_lives: [100, 500],
+  frame_time: 10,
 };
 
 // COMPILE EXPERIMENT

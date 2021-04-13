@@ -39,6 +39,15 @@ jsPsych.plugins["canvas-keys"] = (function () {
         default: [500, 500],
       },
 
+      frame_time: {
+        description:
+          "An integer describing the dropspeed of the target (in milliseconds)",
+        pretty_name: "frame_time",
+        // Takes an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        default: 1000,
+      },
+
       // LIVES
       trial_lives: {
         description: "The number of lives left / to be drawn on the canvas.",
@@ -200,6 +209,10 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Get the 2D context
       var ctx = canvas.getContext("2d");
 
+      // CLEAR CANVAS
+      // clear existing canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       // DRAW TEXT
       // fillText(text, x, y);
       ctx.font = "30px Courier New";
@@ -207,10 +220,49 @@ jsPsych.plugins["canvas-keys"] = (function () {
       ctx.fillText(trial.trial_target, posX, posY);
     }
 
-    show_target(
-      trial.canvas_size_target[0] / 2,
-      trial.canvas_size_target[1] / 2
-    );
+    // intitialze
+    var step_size = 1;
+    posY = 0;
+
+    var animate_target = setInterval(function () {
+      // UPDATE TEXT
+      show_target(
+        // posX is constant
+        trial.canvas_size_target[0] / 2,
+        // posY updated with step_size
+        posY
+      );
+
+      // UPDATE INDEX
+      posY += step_size;
+      if (posY >= trial.canvas_size_target[0]) {
+        clearInterval(animate_target);
+        show_lives((n_lives = 9));
+      }
+    }, trial.frame_time);
+
+    function animate_target(step_size, frame_rate) {
+      yStart = 0; // the top of the canvas is always 0
+      yEnd = trial.canvas_size_target[0];
+
+      // print the time 1s later
+
+      for (i = 0; i <= yEnd; i += step_size) {
+        jsPsych.pluginAPI.setTimeout(function () {
+          console.log(i);
+          console.log(frame_rate);
+          show_target(
+            // posX is constant
+            trial.canvas_size_target[0] / 2,
+            // posY updated with step_size
+            i
+          );
+        }, frame_rate * i);
+      }
+    }
+
+    // animate_target((step_size = 10), (frame_rate = 1000));
+
     // END TRIAL
     // End everything that might have been going on
     // Save data
