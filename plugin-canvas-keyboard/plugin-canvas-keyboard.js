@@ -313,7 +313,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // UPDATE TEXT
       show_target(
         // posX is constant = centralized
-        trial.canvas_size_target[0] / 2,
+        trial.canvas_size_target[1] / 2,
         // posY updated with step_size
         posY
       );

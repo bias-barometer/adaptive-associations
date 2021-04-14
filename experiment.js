@@ -105,11 +105,11 @@ var trial = {
   // NOTE: styling may not be optimal if the height is increased too much
 
   // CANVAS STYLING
-  canvas_size_target: [375, 400],
+  canvas_size_target: [375, 600],
   // Size of the canvas where the lived are displayed [height, width]
   // NOTE: for pretty styling keep width of target & lives canvas the same
   // NOTE: the number of included lives determines the ultimate height of this canvas
-  canvas_size_lives: [100, 400],
+  canvas_size_lives: [100, 600],
 
   // TIMING
   // The time whith which the target frames are updated (i.e., dropspeed)
