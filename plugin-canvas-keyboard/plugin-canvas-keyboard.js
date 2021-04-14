@@ -293,6 +293,14 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       // DRAW TEXT
       // fillText(text, x, y);
+      if (trial.condition == "positive") {
+        ctx.fillStyle = "#009E73"; //green
+      } else if (trial.condition == "negative") {
+        ctx.fillStyle = "#D55E00"; //red
+      } else {
+        // All other cases is black
+        ctx.fillStyle = "#000000";
+      }
       ctx.font = "bold 25px Courier New";
       ctx.textAlign = "center"; // center on x,y coordinates
       ctx.fillText(trial.target, posX, posY);

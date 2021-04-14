@@ -151,8 +151,8 @@ var timeline_practice = {
   timeline: [trial], // show the trials
   timeline_variables: [
     { target: "Chocolate", condition: "neutral" },
-    { target: "Bike", condition: "neutral" },
-    { target: "Balloon", condition: "neutral" },
+    { target: "Bike", condition: "positive" },
+    { target: "Balloon", condition: "negative" },
   ],
   data: { data_type: "practice" },
   randomize_order: false,
