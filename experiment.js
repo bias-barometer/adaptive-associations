@@ -146,7 +146,8 @@ var timeline_experiment = {
 var test = {
   type: "canvas-keys",
   trial_target: "TEST",
-  canvas_size_target: [400, 400], // default
+  canvas_size_target: [375, 400],
+  optimal_time: 375 - 100,
   trial_lives: 10,
   canvas_size_lives: [100, 400],
   frame_time: 100,

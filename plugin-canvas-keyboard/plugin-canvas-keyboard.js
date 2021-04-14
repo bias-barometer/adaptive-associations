@@ -54,7 +54,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
         pretty_name: "optimal_time",
         // Takes an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        default: 400,
       },
 
       // LIVES
@@ -108,6 +107,14 @@ jsPsych.plugins["canvas-keys"] = (function () {
         type: jsPsych.plugins.parameterType.STRING,
         // Defaults to the enter-key
         default: "Enter",
+      },
+
+      feedback_duration: {
+        description: "Time in milliseconds for how long to show feedback.",
+        pretty_name: "feedback_duration",
+        // Take an integer as input (in milliseconds)
+        type: jsPsych.plugins.parameterType.INT,
+        default: 500,
       },
     }, // END parameters
   }; // END plugin.info
@@ -408,6 +415,46 @@ jsPsych.plugins["canvas-keys"] = (function () {
       return validation;
     } // END validate_response
 
+    // SHOW FEEDBACK
+    var answer_speed = "";
+    var lives_posterior = null;
+
+    function show_feedback() {
+      // CATEGORIZE ANSWER
+      // Boundary defined by `optimal_time` passed down with trial information
+      if (posY < trial.optimal_time) {
+        // An answer was provided while the target was still above the
+        // ... optimal boundary time/position
+        answer_speed = "fast";
+        lives_posterior = trial.trial_lives;
+      } else if (
+        (posY > trial.optimal_time) &
+        (posY < trial.canvas_size_target[0])
+      ) {
+        // Answer was slower than optimal time, but still within the canvas (ie in time)
+        answer_speed = "optimal";
+        lives_posterior = trial.trial_lives;
+      } else if (posY >= trial.canvas_size_target[0]) {
+        // Target hit the lower boundary - answer is out of time
+        answer_speed = "slow";
+        lives_posterior = trial.trial_lives - 1;
+      } // END IF answer speed
+
+      // CHANGE STYLING - TARGET
+      if (answer_speed == "slow") {
+        // Show slightly red screen
+        document.getElementById("canvas-target").style.backgroundColor =
+          "rgba(213, 94, 0, 0.3)";
+      } else {
+        // Show slightly green screen
+        document.getElementById("canvas-target").style.backgroundColor =
+          "rgba(0, 158, 115, 0.3)";
+      } // END IF
+
+      // CHANGE STYLING - LIVES
+      show_lives((n_lives = lives_posterior));
+    } // END show_feedback
+
     // START TRIAL
     // Create screens
     display_element.innerHTML = initialize_screens();
@@ -453,46 +500,32 @@ jsPsych.plugins["canvas-keys"] = (function () {
         jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
       }
 
-      // CATEGORIZE ANSWER
-      // Boundary defined by `optimal_time` passed down with trial information
-      if (posY < trial.optimal_time) {
-        // An answer was provided while the target was still above the
-        // ... optimal boundary time/position
-        var answer_speed = "fast";
-        lives_posterior = trial.trial_lives;
-      } else if (
-        (posY > trial.optimal_time) &
-        (posY < trial.canvas_size_target[0])
-      ) {
-        // Answer was slower than optimal time, but still within the canvas (ie in time)
-        var answer_speed = "optimal";
-        lives_posterior = trial.trial_lives;
-      } else if (posY >= trial.canvas_size_target[0]) {
-        // Target hit the lower boundary - answer is out of time
-        var answer_speed = "slow";
-        lives_posterior = trial.trial_lives - 1;
-      } // END IF answer speed
+      // Show feedback
+      show_feedback();
 
-      // clear the display
-      display_element.innerHTML = "";
+      // End trial after showing the feedback for a few milliseconds
+      jsPsych.pluginAPI.setTimeout(function () {
+        // clear the display
+        display_element.innerHTML = "";
 
-      // SAVE DATA
-      // gather the data to store for the trial
-      var trial_data = {
-        target: trial.trial_target,
-        lives: trial.trial_lives,
-        lives_posterior: lives_posterior,
-        canvas_height: trial.canvas_size_target[0],
-        target_height: posY,
-        answer_speed: answer_speed,
-        final_response: visible_responses.join(""),
-        responses: JSON.stringify(all_responses),
-        // Keep track of actions outside the experiment window
-        interactions: jsPsych.data.getInteractionData().json(),
-      };
+        // SAVE DATA
+        // gather the data to store for the trial
+        var trial_data = {
+          target: trial.trial_target,
+          lives: trial.trial_lives,
+          lives_posterior: lives_posterior,
+          canvas_height: trial.canvas_size_target[0],
+          target_height: posY,
+          answer_speed: answer_speed,
+          final_response: visible_responses.join(""),
+          responses: JSON.stringify(all_responses),
+          // Keep track of actions outside the experiment window
+          interactions: jsPsych.data.getInteractionData().json(),
+        };
 
-      // move on to the next trial and save the data
-      jsPsych.finishTrial(trial_data);
+        // move on to the next trial and save the data
+        jsPsych.finishTrial(trial_data);
+      }, trial.feedback_duration);
     } // END end_trial FUNCTION
   }; // END plugin.trila
 
