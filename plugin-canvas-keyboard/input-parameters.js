@@ -30,17 +30,27 @@ var available_keys = [
 ];
 
 // SOURCE: Viridis pallette in R
-// Hex codes from: `pal <- viridisLite::viridis(n = 10)`
+// Hex codes from: `pal <- viridisLite::viridis(n = 50)`
 
 var available_colors = [
   "#440154FF", // purple
-  "#482878FF",
-  "#3E4A89FF",
-  "#31688EFF",
-  "#26828EFF",
-  "#1F9E89FF",
-  "#35B779FF",
-  "#6DCD59FF",
-  "#B4DE2CFF",
+  "#481568FF",
+  "#482677FF",
+  "#453781FF",
+  "#3F4788FF",
+  "#39558CFF",
+  "#32648EFF",
+  "#2D718EFF",
+  "#287D8EFF",
+  "#238A8DFF",
+  "#1F968BFF",
+  "#20A386FF",
+  "#29AF7FFF",
+  "#3CBC75FF",
+  "#56C667FF",
+  "#74D055FF",
+  "#94D840FF",
+  "#B8DE29FF",
+  "#DCE318FF",
   "#FDE725FF", // yellow
 ];
