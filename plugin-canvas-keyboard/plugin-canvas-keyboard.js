@@ -149,6 +149,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       // Canvas element for moving target
       target_html =
+        "<div id='target'>" +
         "<canvas id='canvas-target' " +
         // Draw a black border around the canvas
         "style='border:1px solid #000000;' " +
@@ -161,10 +162,12 @@ jsPsych.plugins["canvas-keys"] = (function () {
         trial.canvas_size_target[1] +
         "'" +
         ">" +
-        "</canvas>";
+        "</canvas>" +
+        "</div>";
 
       // Canvas element for lives
       lives_html =
+        "<div id = 'lives'>" +
         "<canvas id='canvas-lives'" +
         // Draw a black border around the canvas
         "style='border:1px solid #000000;' " +
@@ -177,7 +180,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         trial.canvas_size_lives[1] +
         "'" +
         ">" +
-        "</canvas><br><br>";
+        "</canvas></div><br>";
 
       // Display the participants typed responses
       response_html = "<div id='html-response'>" + "_" + "</div> <br>";
