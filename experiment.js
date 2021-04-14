@@ -8,6 +8,18 @@
 // SET-UP
 // Initialize timeline variable (required)
 var timeline = [];
+// Initialize variables that are re-used flexibly within trials
+var initialize_experiment = {
+  // Basicly an empty function that is called but does not show anything on screen
+  type: "call-function",
+  // Do nothing
+  func: function () {},
+  // Save the required data that is fed into the first trial.
+  data: {
+    new_dropspeed: 300,
+    new_lives: 20,
+  },
+};
 
 // SCREEN: Informed Consent
 var informed_consent = {
@@ -79,27 +91,68 @@ var instructions = {
 
 // SCREEN: Trial
 var trial = {
-  // Custom plugin
-  type: "html-keyboard-text",
-  // Get stimulus content from timeline variable
-  stimulus: jsPsych.timelineVariable("target_word"),
-  // Show instructions about what to do
-  show_instructions: jsPsych.timelineVariable("show_instructions"),
-  // All keys may be used to provide an answer
-  response_keys: jsPsych.ALL_KEYS,
-  // Self-paced == infinite length
-  trial_duration: null,
-  // How to continue to the next trial
-  end_trial_key: "Enter", // add as string for proper validation
-}; // END trial
+  // Use a custom created plugin (see plugin-canvas-keyboard.js)
+  type: "canvas-keys",
+  // TARGET
+  // The word that should be displayed to the participants
+  // NOTE: Provided from the timeline variable (flexible)
+  target: jsPsych.timelineVariable("target"),
+  // The condition of the trial (positive, negative, neutral)
+  // Determines the color of the presented stimulus
+  // NOTE: Provided from the timeline variable (flexible)
+  condition: jsPsych.timelineVariable("condition"),
+  // Size of the canvas where the target moves [height, width]
+  // NOTE: styling may not be optimal if the height is increased too much
+
+  // CANVAS STYLING
+  canvas_size_target: [375, 400],
+  // Size of the canvas where the lived are displayed [height, width]
+  // NOTE: for pretty styling keep width of target & lives canvas the same
+  // NOTE: the number of included lives determines the ultimate height of this canvas
+  canvas_size_lives: [100, 400],
+
+  // TIMING
+  // The time whith which the target frames are updated (i.e., dropspeed)
+  // NOTE: variable dependent on the last saved data (i.e., last response)
+  dropspeed: function () {
+    return jsPsych.data.get().last(1).values()[0].new_dropspeed;
+  },
+  // Change in dropspeed after fast/slow answer
+  dropspeed_step_size: 50,
+  // Optimal response position (i.e., no need to change dropspeed)
+  // NOTE: this is in pixels, dependent on canvas target height
+  optimal_time: 300,
+
+  // LIVES
+  // Number of lives to display (in first trial)
+  // Fixes the styling between trials
+  experiment_lives: 20,
+  // Number of lives to display in this trial
+  // NOTE: variable dependent on the last saved data (i.e., last response)
+  lives: function () {
+    return jsPsych.data.get().last(1).values()[0].new_lives;
+  },
+
+  // RESPONSES
+  // Which keyboard keys participants can use to type their answers
+  // NOTE: a-z characters stored in "input-parameters.js"
+  // NOTE: per default the "end_key", backspace and spacebar are added.
+  response_keys: available_keys,
+  // Which key participants can use to submit their answers
+  end_key: "Enter",
+
+  // FEEDBACK
+  // Time in milliseconds how long to display the feedback for
+  feedback_duration: 250,
+};
 
 // TIMELINE: pratice trials
 var timeline_practice = {
   timeline: [trial], // show the trials
   timeline_variables: [
-    { target_word: "Chocolate", show_instructions: true },
-    { target_word: "Bike", show_instructions: true },
-    { target_word: "Balloon", show_instructions: false },
+    { target: "Chocolate", condition: "neutral" },
+    { target: "Bike", condition: "neutral" },
+    { target: "Balloon", condition: "neutral" },
   ],
   data: { data_type: "practice" },
   randomize_order: false,
@@ -145,12 +198,12 @@ var timeline_experiment = {
 
 var test = {
   type: "canvas-keys",
-  trial_target: "TEST",
+  target: "TEST",
   canvas_size_target: [375, 400],
   optimal_time: 375 - 100,
-  trial_lives: 10,
+  lives: 20,
   canvas_size_lives: [100, 400],
-  frame_time: 100,
+  frame_time: 300,
 };
 
 // COMPILE EXPERIMENT
@@ -161,7 +214,7 @@ var test = {
 // timeline.push(timeline_practice);
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
-timeline.push(test);
+timeline.push(initialize_experiment, timeline_practice);
 
 // INITIALIZE EXPERIMENT
 // (Required)

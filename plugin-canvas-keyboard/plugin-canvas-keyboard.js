@@ -19,15 +19,25 @@ jsPsych.plugins["canvas-keys"] = (function () {
     name: "canvas-keys",
     parameters: {
       // TARGET
-      trial_target: {
+      target: {
         description: "A string to be displayed as the moving stimulus/enemy.",
-        pretty_name: "trial_target",
+        pretty_name: "target",
         // Take a plain string as input.
         type: jsPsych.plugins.parameterType.STRING,
         // Do not provide a default so that error is thrown when not provided
         default: undefined,
-      }, // END trial_target
+      }, // END target
 
+      condition: {
+        description:
+          "A string [positive, negative, neutral] that determines the color of the presented target",
+        pretty_name: "condition",
+        // Take a plain string as input
+        type: jsPsych.plugins.parameterType.STRING,
+        // Default to neutral (black)
+        default: "neutral",
+      },
+      // CANVAS STYLING
       canvas_size_target: {
         description:
           "Array containing the height (first value) and width (second value) of the canvas element.",
@@ -38,33 +48,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Default to 500 px by 500 px
         default: [500, 500],
       },
-
-      frame_time: {
-        description:
-          "An integer describing the dropspeed of the target (in milliseconds)",
-        pretty_name: "frame_time",
-        // Takes an integer as input
-        type: jsPsych.plugins.parameterType.INT,
-        default: 1000,
-      },
-
-      optimal_time: {
-        description:
-          "An integer describing the y-coordinates on the canvas below which we consider the answer optimal",
-        pretty_name: "optimal_time",
-        // Takes an integer as input
-        type: jsPsych.plugins.parameterType.INT,
-      },
-
-      // LIVES
-      trial_lives: {
-        description: "The number of lives left / to be drawn on the canvas.",
-        pretty_name: "trial_lives",
-        // Take an integer as input
-        type: jsPsych.plugins.parameterType.INT,
-        // Default to all lives (N = 10),
-        default: 10,
-      }, // END trial_lives
 
       canvas_size_lives: {
         description:
@@ -77,16 +60,55 @@ jsPsych.plugins["canvas-keys"] = (function () {
         default: [100, 500],
       },
 
-      // TRIAL
-      trial_duration: {
-        description: "How long to show trial before it ends.",
-        pretty_name: "trial_duration",
-        // Take an integer as input (in milliseconds)
+      // TIMING
+      dropspeed: {
+        description:
+          "An integer describing the dropspeed of the target (in milliseconds)",
+        pretty_name: "dropspeed",
+        // Takes an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        // Defaults to infinite duration (i.e., self-paced)
-        default: null,
-      }, // END trial_duration
+        // Defaults to relatively slow
+        default: 500,
+      },
 
+      dropspeed_step_size: {
+        description:
+          "An integer describing the dropspeed adjustments (in milliseconds) to adjust dropspeed",
+        pretty_name: "dropspeed_step_size",
+        // Takes an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        // Defaults to relatively small changes
+        default: 50,
+      },
+
+      optimal_time: {
+        description:
+          "An integer describing the y-coordinates on the canvas below which we consider the answer optimal",
+        pretty_name: "optimal_time",
+        // Takes an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        // Do not provide a default as it is largely dependent on the styling
+      },
+
+      // LIVES
+      experiment_lives: {
+        description: "The number of lives overall provided in the experiment",
+        pretty_name: "experiment_lives",
+        // Take an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        // Default to all lives (N = 20),
+        default: 20,
+      }, // END lives
+
+      lives: {
+        description: "The number of lives left in this trial to show on screen",
+        pretty_name: "lives",
+        // Take an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        // Do not provide a default
+      },
+
+      // RESPONSES
       response_keys: {
         description:
           "The keyboard keys that one can use which are visualized on screen.",
@@ -95,26 +117,27 @@ jsPsych.plugins["canvas-keys"] = (function () {
         type: jsPsych.plugins.parameterType.KEY,
         // Allow passing of multiple values
         array: true,
-        // Default values stored in "response-keys.js"
+        // Default values stored in "input-parameters.js"
         default: available_keys,
       }, // END response_keys
 
-      end_trial_key: {
+      end_key: {
         description:
           "The key the subject is allowed to press to end the trial.",
-        pretty_name: "end_trial_key",
+        pretty_name: "end_key",
         // Take a string as input (because of how compareKeys works)
         type: jsPsych.plugins.parameterType.STRING,
         // Defaults to the enter-key
         default: "Enter",
       },
-
+      // FEEDBACK
       feedback_duration: {
         description: "Time in milliseconds for how long to show feedback.",
         pretty_name: "feedback_duration",
         // Take an integer as input (in milliseconds)
         type: jsPsych.plugins.parameterType.INT,
-        default: 500,
+        // Defaults to relatively long
+        default: 250,
       },
     }, // END parameters
   }; // END plugin.info
@@ -129,17 +152,26 @@ jsPsych.plugins["canvas-keys"] = (function () {
     var all_responses = [];
     // Keep track of the string that should be visualized on screen
     var visible_responses = [];
-    // All response keys
+
+    // RESPONSE KEYS
+    // Combine all response keys which should be monitored
     var all_response_keys = available_keys; // get from input-parameters.js (a-z)
     all_response_keys.push(" "); // add spacebar
     all_response_keys.push("backspace"); // add backspace for error correction
-    all_response_keys.push(trial.end_trial_key); // add the key that signals the end of the trial (enter)
+    all_response_keys.push(trial.end_key); // add the key that signals the end of the trial (enter)
+
     // ANIMATION
     // The number of pixels the target should drop each framerate
     // Lower numbers ensure smoother transitions
     var step_size = 10;
     // Initialize the starting position of the target (always on the top of the screen)
     posY = 0;
+
+    // FEEDBACK
+    // Initialize variables globally for later use
+    var answer_speed = "";
+    var new_lives = null;
+    var new_dropspeed = null;
 
     // CREATE SCREENS
     // The jsPsych styling sheet ensures that all elements (within "display_element") are centered on screen.
@@ -153,11 +185,11 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "<canvas id='canvas-target' " +
         // Draw a black border around the canvas
         "style='border:1px solid #000000;' " +
-        // Set hight (from trial info - defaults to 500)
+        // Set height (from trial info)
         "height='" +
         trial.canvas_size_target[0] +
         "'" +
-        // Set width (from trial info - defaults to 500)
+        // Set width (from trial info)
         "width='" +
         trial.canvas_size_target[1] +
         "'" +
@@ -175,7 +207,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "height='" +
         trial.canvas_size_lives[0] +
         "'" +
-        // Set width (from trial info - defaults to 500)
+        // Set width (from trial info)
         "width='" +
         trial.canvas_size_lives[1] +
         "'" +
@@ -190,7 +222,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       continue_html =
         "<div id='html-continue'>" +
         "Press <b>" +
-        trial.end_trial_key +
+        trial.end_key +
         "</b> to continue" +
         "</div>";
 
@@ -215,14 +247,14 @@ jsPsych.plugins["canvas-keys"] = (function () {
       var margin = 5; // space between borders of the circles
       var canvas_width = trial.canvas_size_lives[1]; // defined in trial
       // compute left over space taking into account the margins
-      var margin_width = (trial.trial_lives + 2) * margin;
+      var margin_width = (trial.experiment_lives + 2) * margin;
       // Compute size of the lives (rounded down to whole pixels)
       var life_width = Math.floor(
-        (canvas_width - margin_width) / trial.trial_lives
+        (canvas_width - margin_width) / trial.experiment_lives
       );
 
       // Circle size in the width determines the canvasses' height.
-      var canvas_height = life_width + 10;
+      var canvas_height = life_width + margin * 2; // add space between border
       document.getElementById("canvas-lives").height = canvas_height;
 
       // INITIALIZE
@@ -261,9 +293,9 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       // DRAW TEXT
       // fillText(text, x, y);
-      ctx.font = "bold 30px Courier New";
+      ctx.font = "bold 25px Courier New";
       ctx.textAlign = "center"; // center on x,y coordinates
-      ctx.fillText(trial.trial_target, posX, posY);
+      ctx.fillText(trial.target, posX, posY);
     } // END show_target
 
     // ANIMATE TARGET
@@ -288,7 +320,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Finish the trial
         end_trial();
       }
-    }, trial.frame_time);
+    }, trial.dropspeed);
 
     // SHOW RESPONSE
     // Everytime the participant presses a key, the response_html should be updated
@@ -306,14 +338,13 @@ jsPsych.plugins["canvas-keys"] = (function () {
     // Ending the trial (end_trial)
     // Pressing the spacebar (convert to " ")
     // Pressing the left- or right-arrow (convert to different index)
-
     function update_response(info) {
       // `info` is passed down from the keyBoardListener API
       // SAVE RESPONSE
       // Save the pressed key and the response time
       all_responses.push(info);
       // PROCESS RESPONSE
-      if (jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.end_key)) {
         // Signal the end of the trial when the designated key is pressed
         // Ensure that correct answer is given
         var valid_response = validate_response();
@@ -335,7 +366,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       } // END IF
 
       // VISUALIZE RESPONSE
-      if (!jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
+      if (!jsPsych.pluginAPI.compareKeys(info.key, trial.end_key)) {
         // Only needs to be shown when the trial continues
         show_response();
       }
@@ -419,29 +450,44 @@ jsPsych.plugins["canvas-keys"] = (function () {
     } // END validate_response
 
     // SHOW FEEDBACK
-    var answer_speed = "";
-    var lives_posterior = null;
-
     function show_feedback() {
-      // CATEGORIZE ANSWER
-      // Boundary defined by `optimal_time` passed down with trial information
+      // The new trial relies heavily on the speed with which an association was given
+      // We destinguish between three types of answer:
+      // Fast: answers were given with a lot of time to spare
+      // Optimal: answers were given with minimal time to spare
+      // Slow: answers were not given in time.
+
       if (posY < trial.optimal_time) {
-        // An answer was provided while the target was still above the
-        // ... optimal boundary time/position
+        // FAST ANSWER
+        // Store speed
         answer_speed = "fast";
-        lives_posterior = trial.trial_lives;
+        // Lives are retained
+        new_lives = trial.lives;
+        // Drop speed is sped up
+        new_dropspeed = trial.dropspeed - trial.dropspeed_step_size;
       } else if (
         (posY > trial.optimal_time) &
         (posY < trial.canvas_size_target[0])
       ) {
-        // Answer was slower than optimal time, but still within the canvas (ie in time)
+        // OPTIMAL ANSWER
+        // Store speed
         answer_speed = "optimal";
-        lives_posterior = trial.trial_lives;
+        // Lives are retained
+        new_lives = trial.lives;
+        // Drop speed is retained
+        new_dropspeed = trial.dropspeed;
       } else if (posY >= trial.canvas_size_target[0]) {
-        // Target hit the lower boundary - answer is out of time
+        // SLOW ANSWER
+        // The participant did not provide an answer before the target
+        // ... left the screen
+        // Store speed
         answer_speed = "slow";
-        lives_posterior = trial.trial_lives - 1;
-      } // END IF answer speed
+        // A life is lost
+        new_lives = trial.lives - 1;
+        show_lives((n_lives = new_lives));
+        // Drop speed is slowed down
+        new_dropspeed = trial.dropspeed + trial.dropspeed_step_size;
+      }
 
       // CHANGE STYLING - TARGET
       if (answer_speed == "slow") {
@@ -453,45 +499,43 @@ jsPsych.plugins["canvas-keys"] = (function () {
         document.getElementById("canvas-target").style.backgroundColor =
           "rgba(0, 158, 115, 0.3)";
       } // END IF
-
-      // CHANGE STYLING - LIVES
-      show_lives((n_lives = lives_posterior));
     } // END show_feedback
 
     // START TRIAL
-    // Create screens
-    display_element.innerHTML = initialize_screens();
+    function start_trial() {
+      // Show screen elements
+      display_element.innerHTML = initialize_screens();
 
-    // Show lives
-    show_lives((n_lives = trial.trial_lives));
+      // Show lives
+      show_lives((n_lives = trial.lives));
 
-    // Add Keyboard Listeners
-    // Listen to each and every key press an participant makes
-    // Do not need to listen if no keys were defined
-    if (trial.response_keys != jsPsych.NO_KEYS) {
-      // Calls an existing function
-      var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
-        // Which function to execute when the key is pressed
-        // Defined above
-        callback_function: update_response,
-        // Which keys trigger the callback
-        valid_responses: all_response_keys, // needs to be an array
-        // Save RT based on key press rather than audio stimuli
-        // see jsPsych.js/module.getKeyboardResponse
-        // performance.now();
-        rt_method: "performance",
-        // keyboard listener remains active for additional keypresses
-        persist: true,
-        // Do not validate long key presses
-        allow_held_key: false,
-      });
-    } // END IF keyBoardListener
-
+      // Add Keyboard Listeners
+      // Listen to each and every key press an participant makes
+      // Do not need to listen if no keys were defined
+      if (trial.response_keys != jsPsych.NO_KEYS) {
+        // Calls an existing function
+        var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+          // Which function to execute when the key is pressed
+          // Defined above
+          callback_function: update_response,
+          // Which keys trigger the callback
+          valid_responses: all_response_keys, // needs to be an array
+          // Save RT based on key press rather than audio stimuli
+          // see jsPsych.js/module.getKeyboardResponse
+          // performance.now();
+          rt_method: "performance",
+          // keyboard listener remains active for additional keypresses
+          persist: true,
+          // Do not validate long key presses
+          allow_held_key: false,
+        });
+      } // END IF keyBoardListener
+    }
+    start_trial();
     // END TRIAL
     // End everything that might have been going on
     // Save data
     // Proceed to next trial or end-of-experiment (automatically)
-
     function end_trial() {
       // STOP ongoing procecsses
       // kill any remaining setTimeout handlers
@@ -513,21 +557,39 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
         // SAVE DATA
         // gather the data to store for the trial
-        var trial_data = {
-          target: trial.trial_target,
-          lives: trial.trial_lives,
-          lives_posterior: lives_posterior,
-          canvas_height: trial.canvas_size_target[0],
-          target_height: posY,
-          answer_speed: answer_speed,
-          final_response: visible_responses.join(""),
-          responses: JSON.stringify(all_responses),
-          // Keep track of actions outside the experiment window
+        var data = {
+          // Word shown during the trial
+          target: trial.target,
+          // Condition (neutral, positive, negative)
+          condition: trial.condition,
+          // Canvas height = max pixels that can be dropped
+          max_RT_px: trial.canvas_size_target[0], // canvas height
+          // Defined optimal pixel height
+          optimal_RT_px: trial.optimal_time,
+          // Response time in pixels (0 is top)
+          RT_px: posY,
+          // Whether the response was fast, optimal, or slow
+          speed_category: answer_speed,
+          // Dropspeed with which the target moved across the canvas
+          dropspeed: trial.dropspeed,
+          // Adjusted dropspeed - dependent on speed_category
+          new_dropspeed: new_dropspeed,
+          // Number of lives with which the experiment was started
+          experiment_lives: trial.experiment_lives,
+          // Number of lives in the current trial
+          lives: trial.lives,
+          // Number of lives after the trial - dependent on speed_category
+          new_lives: new_lives,
+          // The provided responses / association as one word
+          association: visible_responses.join(""),
+          // Each keystroke including timing
+          key_responses: JSON.stringify(all_responses),
+          // Keep track of actions outside the experiment window - for exclusion
           interactions: jsPsych.data.getInteractionData().json(),
         };
 
         // move on to the next trial and save the data
-        jsPsych.finishTrial(trial_data);
+        jsPsych.finishTrial(data);
       }, trial.feedback_duration);
     } // END end_trial FUNCTION
   }; // END plugin.trila
