@@ -48,6 +48,15 @@ jsPsych.plugins["canvas-keys"] = (function () {
         default: 1000,
       },
 
+      optimal_time: {
+        description:
+          "An integer describing the y-coordinates on the canvas below which we consider the answer optimal",
+        pretty_name: "optimal_time",
+        // Takes an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        default: 400,
+      },
+
       // LIVES
       trial_lives: {
         description: "The number of lives left / to be drawn on the canvas.",
@@ -90,6 +99,16 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Default values stored in "response-keys.js"
         default: available_keys,
       }, // END response_keys
+
+      end_trial_key: {
+        description:
+          "The key the subject is allowed to press to end the trial.",
+        pretty_name: "end_trial_key",
+        // Take a string as input (because of how compareKeys works)
+        type: jsPsych.plugins.parameterType.STRING,
+        // Defaults to the enter-key
+        default: "Enter",
+      },
     }, // END parameters
   }; // END plugin.info
 
@@ -103,10 +122,24 @@ jsPsych.plugins["canvas-keys"] = (function () {
     var all_responses = [];
     // Keep track of the string that should be visualized on screen
     var visible_responses = [];
+    // All response keys
+    var all_response_keys = available_keys; // get from input-parameters.js (a-z)
+    all_response_keys.push(" "); // add spacebar
+    all_response_keys.push("backspace"); // add backspace for error correction
+    all_response_keys.push(trial.end_trial_key); // add the key that signals the end of the trial (enter)
+    // ANIMATION
+    // The number of pixels the target should drop each framerate
+    // Lower numbers ensure smoother transitions
+    var step_size = 10;
+    // Initialize the starting position of the target (always on the top of the screen)
+    posY = 0;
 
     // CREATE SCREENS
     // The jsPsych styling sheet ensures that all elements (within "display_element") are centered on screen.
     function initialize_screens() {
+      instruction_html =
+        "<div id = 'html-instruction'> Type the <i> first </i> word(s) that comes to mind. </div><br>";
+
       // Canvas element for moving target
       target_html =
         "<canvas id='canvas-target' " +
@@ -137,29 +170,33 @@ jsPsych.plugins["canvas-keys"] = (function () {
         trial.canvas_size_lives[1] +
         "'" +
         ">" +
-        "</canvas>";
+        "</canvas><br><br>";
 
       // Display the participants typed responses
-      response_html = "<div id='html-response'>" + "_ " + "</div> <br>";
+      response_html = "<div id='html-response'>" + "_" + "</div> <br>";
 
       // Display the instruction so that participants know which
       // key to press to continue to the next trial.
       continue_html =
         "<div id='html-continue'>" +
-        "Press <b> Enter </b> to continue" +
-        "</div><br>";
+        "Press <b>" +
+        trial.end_trial_key +
+        "</b> to continue" +
+        "</div>";
 
       // Display the answer feedback in case a wrong answer is provided
-      feedback_html = "<div id='html-feedback'>" + "" + "</div>";
+      feedback_html = "<div id='html-feedback'></div>";
 
       // RETURN
       return (
-        target_html + lives_html + response_html + continue_html + feedback_html
+        instruction_html +
+        target_html +
+        lives_html +
+        response_html +
+        continue_html +
+        feedback_html
       );
     } // END initalize_screens
-
-    // Combine all elements and show on screen
-    display_element.innerHTML = initialize_screens();
 
     // SHOW LIVES
     function show_lives(n_lives) {
@@ -198,8 +235,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         ctx.fill();
         ctx.stroke();
       }
-    }
-    show_lives(10);
+    } // END show_lives
 
     // SHOW TARGET
     function show_target(posX, posY) {
@@ -210,58 +246,196 @@ jsPsych.plugins["canvas-keys"] = (function () {
       var ctx = canvas.getContext("2d");
 
       // CLEAR CANVAS
-      // clear existing canvas
+      // clear existing canvas otherwise a trial of elements gets painted
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // DRAW TEXT
       // fillText(text, x, y);
-      ctx.font = "30px Courier New";
-      ctx.textAlign = "center";
+      ctx.font = "bold 30px Courier New";
+      ctx.textAlign = "center"; // center on x,y coordinates
       ctx.fillText(trial.trial_target, posX, posY);
-    }
+    } // END show_target
 
-    // intitialze
-    var step_size = 1;
-    posY = 0;
-
+    // ANIMATE TARGET
+    // Using the setInterval time ensure that the included code is executed sequentially
+    /// With the frame_time intervals
     var animate_target = setInterval(function () {
       // UPDATE TEXT
       show_target(
-        // posX is constant
+        // posX is constant = centralized
         trial.canvas_size_target[0] / 2,
         // posY updated with step_size
         posY
       );
 
-      // UPDATE INDEX
+      // UPDATE posY
       posY += step_size;
+      // Check if target has reached the bottom
       if (posY >= trial.canvas_size_target[0]) {
+        // Cancel all intervals that are still ongoing
         clearInterval(animate_target);
-        show_lives((n_lives = 9));
+
+        // Finish the trial
+        end_trial();
       }
     }, trial.frame_time);
 
-    function animate_target(step_size, frame_rate) {
-      yStart = 0; // the top of the canvas is always 0
-      yEnd = trial.canvas_size_target[0];
+    // SHOW RESPONSE
+    // Everytime the participant presses a key, the response_html should be updated
+    // to visualize what the participant typed.
+    function show_response() {
+      // Update the innerHTML of the <p> element
+      document.getElementById("html-response").innerHTML =
+        // Show the combined letters as one concatenated string
+        visible_responses.join("") + "_";
+    } // END show_response FUNCTION
 
-      // print the time 1s later
+    // UPDATE RESPONSE
+    // Update the visisble response based on the key that was pressed by the participant
+    // Exceptional cases:
+    // Ending the trial (end_trial)
+    // Pressing the spacebar (convert to " ")
+    // Pressing the left- or right-arrow (convert to different index)
 
-      for (i = 0; i <= yEnd; i += step_size) {
-        jsPsych.pluginAPI.setTimeout(function () {
-          console.log(i);
-          console.log(frame_rate);
-          show_target(
-            // posX is constant
-            trial.canvas_size_target[0] / 2,
-            // posY updated with step_size
-            i
-          );
-        }, frame_rate * i);
+    function update_response(info) {
+      // `info` is passed down from the keyBoardListener API
+      // SAVE RESPONSE
+      // Save the pressed key and the response time
+      all_responses.push(info);
+      // PROCESS RESPONSE
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
+        // Signal the end of the trial when the designated key is pressed
+        // Ensure that correct answer is given
+        var valid_response = validate_response();
+
+        if (valid_response.valid) {
+          // End the trial because a valid response was given
+          end_trial();
+        } else {
+          // Provide an alert message to indicate the need for a valid response
+          document.getElementById("html-feedback").innerHTML =
+            "<i>" + valid_response.message + "</i>";
+        } // END IF validate response
+      } else if (jsPsych.pluginAPI.compareKeys(info.key, "backspace")) {
+        // Remove the last letter entered to resemble a backspace action
+        visible_responses.pop();
+      } else {
+        // A normal letter or the spacebar was pressed that should be visualized
+        visible_responses.push(info.key);
+      } // END IF
+
+      // VISUALIZE RESPONSE
+      if (!jsPsych.pluginAPI.compareKeys(info.key, trial.end_trial_key)) {
+        // Only needs to be shown when the trial continues
+        show_response();
       }
-    }
+    } // END update_response FUNCTION
 
-    // animate_target((step_size = 10), (frame_rate = 1000));
+    // ANSWER VALIDATION
+    // An answer may only be submitted if:
+    // It contains one to two words
+    // Each word contains more than two characters
+    function validate_response() {
+      // CLEAN ANSWER
+      // Get the total answer string
+      var answer = visible_responses.join("");
+
+      // Clean double spaces, tabs, etc.
+      // Replace everything that is more than one space with one space
+      answer = answer.replace(/\s+/g, " ");
+      // Remove any leading or trailing spaces
+      answer = answer.trim();
+      // N WORDS
+      // Detect the number of words that are left when the string is split by spaces
+      if (answer == "") {
+        var n_words = 0;
+      } else {
+        var n_words = answer.split(" ").length;
+      }
+
+      // N CHARACTERS
+      // Detect the number of characters per word
+      // Extract each word seperately
+      var words = answer.split(" ");
+      // Initialize
+      var n_characters_per_word = [];
+
+      // Loop over words
+      for (var w in words) {
+        // Store the number of characters in each word
+        n_characters_per_word.push(words[w].length);
+      }
+
+      // Determine the minimum number of characters in a word
+      // NOTE: for applying Math.min to an array the three ... are necessary
+      n_characters = Math.min(...n_characters_per_word);
+
+      // VALIDATION
+      // The answer should have the correct numbers of words (1 - 2)
+      // AND
+      // The correct number of characters in each word
+
+      if ((n_words == 1) | (n_words == 2)) {
+        // Correct number of words - check characters
+        if (n_characters >= 2) {
+          // VALID answers
+          validation = {
+            valid: true,
+            message: "", // no feedback to display
+          };
+        } else {
+          // Insufficient number of characters
+          validation = {
+            valid: false,
+            message: "Each word must have more than 2 characters.", // display feedback
+          };
+        }
+      } else if (n_words == 0) {
+        // Insufficient number of words
+        validation = {
+          valid: false,
+          message: "Your answer is too short (required: 1 - 2 words)", // display feedback
+        };
+      } else if (n_words > 2) {
+        // Too many words
+        validation = {
+          valid: false,
+          message:
+            "Your answer is too long (required: 1 - 2 words). Use <b> backspace </b> to shorten your answer.", // display feedback
+        };
+      } // END IF n_words
+
+      return validation;
+    } // END validate_response
+
+    // START TRIAL
+    // Create screens
+    display_element.innerHTML = initialize_screens();
+
+    // Show lives
+    show_lives((n_lives = trial.trial_lives));
+
+    // Add Keyboard Listeners
+    // Listen to each and every key press an participant makes
+    // Do not need to listen if no keys were defined
+    if (trial.response_keys != jsPsych.NO_KEYS) {
+      // Calls an existing function
+      var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+        // Which function to execute when the key is pressed
+        // Defined above
+        callback_function: update_response,
+        // Which keys trigger the callback
+        valid_responses: all_response_keys, // needs to be an array
+        // Save RT based on key press rather than audio stimuli
+        // see jsPsych.js/module.getKeyboardResponse
+        // performance.now();
+        rt_method: "performance",
+        // keyboard listener remains active for additional keypresses
+        persist: true,
+        // Do not validate long key presses
+        allow_held_key: false,
+      });
+    } // END IF keyBoardListener
 
     // END TRIAL
     // End everything that might have been going on
@@ -272,11 +446,32 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // STOP ongoing procecsses
       // kill any remaining setTimeout handlers
       jsPsych.pluginAPI.clearAllTimeouts();
-
+      // Kill any remaining canvas animations
+      clearInterval(animate_target);
       // kill all keyboard listeners
       if (typeof keyboardListener !== "undefined") {
         jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
       }
+
+      // CATEGORIZE ANSWER
+      // Boundary defined by `optimal_time` passed down with trial information
+      if (posY < trial.optimal_time) {
+        // An answer was provided while the target was still above the
+        // ... optimal boundary time/position
+        var answer_speed = "fast";
+        lives_posterior = trial.trial_lives;
+      } else if (
+        (posY > trial.optimal_time) &
+        (posY < trial.canvas_size_target[0])
+      ) {
+        // Answer was slower than optimal time, but still within the canvas (ie in time)
+        var answer_speed = "optimal";
+        lives_posterior = trial.trial_lives;
+      } else if (posY >= trial.canvas_size_target[0]) {
+        // Target hit the lower boundary - answer is out of time
+        var answer_speed = "slow";
+        lives_posterior = trial.trial_lives - 1;
+      } // END IF answer speed
 
       // clear the display
       display_element.innerHTML = "";
@@ -284,7 +479,12 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // SAVE DATA
       // gather the data to store for the trial
       var trial_data = {
-        stimulus: trial.stimulus,
+        target: trial.trial_target,
+        lives: trial.trial_lives,
+        lives_posterior: lives_posterior,
+        canvas_height: trial.canvas_size_target[0],
+        target_height: posY,
+        answer_speed: answer_speed,
         final_response: visible_responses.join(""),
         responses: JSON.stringify(all_responses),
         // Keep track of actions outside the experiment window
