@@ -551,9 +551,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Kill any remaining canvas animations
       clearInterval(animate_target);
       // kill all keyboard listeners
-      if (typeof keyboardListener !== "undefined") {
-        jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
-      }
+      jsPsych.pluginAPI.cancelAllKeyboardResponses();
 
       // Show feedback
       show_feedback();

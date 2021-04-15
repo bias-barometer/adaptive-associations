@@ -18,6 +18,7 @@ var initialize_experiment = {
   data: {
     new_dropspeed: 300,
     new_lives: 20,
+    data_type: "initialize",
   },
 };
 
@@ -87,6 +88,8 @@ var instructions = {
       "<p> Press <b> Enter </b> for 3 practice words",
   ],
   key_forward: "Enter",
+  // Add information for easy data processing
+  data: { data_type: "instructions" },
 };
 
 // SCREEN: Trial
@@ -176,35 +179,20 @@ var instructions_start = {
       "<br>" +
       "<p> Press <b> Enter </b> to get started",
   ],
+  // Add information for easy data processing
+  data: { data_type: "instructions" },
 };
 
 // TIMELINE: experiment trials
 var timeline_experiment = {
   timeline: [trial], // show the trials
-  timeline_variables: [
-    { target_word: "Male", show_instructions: false },
-    { target_word: "Female", show_instructions: false },
-    { target_word: "Gay", show_instructions: false },
-    { target_word: "Lesbian", show_instructions: false },
-    { target_word: "Asian", show_instructions: false },
-    { target_word: "Black", show_instructions: false },
-    { target_word: "Politician", show_instructions: false },
-    { target_word: "Lawyer", show_instructions: false },
-  ],
+  timeline_variables: target_stimuli,
   data: { data_type: "experiment" },
-  randomize_order: true, // randomize the trials
-  repetitions: 2, // present each trial twice.
+  sample: {
+    type: "without-replacement",
+    size: 10, // 10 trials
+  },
 }; // END all_trials
-
-var test = {
-  type: "canvas-keys",
-  target: "TEST",
-  canvas_size_target: [375, 400],
-  optimal_time: 375 - 100,
-  lives: 20,
-  canvas_size_lives: [100, 400],
-  frame_time: 300,
-};
 
 // COMPILE EXPERIMENT
 // (Required)
@@ -214,7 +202,13 @@ var test = {
 // timeline.push(timeline_practice);
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
-timeline.push(initialize_experiment, timeline_practice);
+timeline.push(
+  initialize_experiment,
+  timeline_practice,
+  instructions_start,
+  initialize_experiment,
+  timeline_experiment
+);
 
 // INITIALIZE EXPERIMENT
 // (Required)
