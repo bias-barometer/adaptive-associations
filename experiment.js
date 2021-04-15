@@ -22,74 +22,25 @@ var initialize_experiment = {
   },
 };
 
-// SCREEN: Informed Consent
-var informed_consent = {
-  // text + keyboard response
-  type: "html-keyboard-response",
-  // text to display
-  stimulus:
-    "<p> -- Informed Consent Text --- </p>" +
-    "<p> If you agree with these conditions press <b> Enter </b> to continue </p>",
-  // only proceed when the spacebar is pressed
-  // https://keycode.info/ for information on the textual represprentation of each key
-  choices: ["Enter"],
-  // Add information for easy data processing
-  data: { data_type: "informed_consent" },
-};
-
 // SCREEN: Instructions
 var instructions = {
   type: "instructions",
-  pages: [
-    // Welcome
-    "<p> Welcome to the Free Associations ... </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> We want to know what you think about when you read a word. </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> For example, what are you thinking about after reading the word: </p>" +
-      "<br>" +
-      "<p> Chocolate </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> We want you to type the <b> first </b> thought that comes to mind. </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> Let's show you what the Free Associations ... looks like: " +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> <b>Chocolate </b> </p>" +
-      "<p><i> This is the word we want you to read </i></p>" +
-      "<br>" +
-      "<p> _ </p>" +
-      "<p><i> This is where we show your response when you type on the keyboard </i></p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue" +
-      "<p><i> When you are done typing you can press <b> Enter </b> to continue to the next word</i></p>",
-    //
-    "<p> What should a response look like? </p>" +
-      "<br>" +
-      "<p> You can only use lowercase letters (a-z) </p>" +
-      "<p> Use the <b> backspace </b> to correct typing errors </p>" +
-      "<br>" +
-      "<p> Only type 1 or 2 words (no sentences) </p>" +
-      "<p> Each word should contain more than 2 characters (no 'a' or 'an') </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to continue",
-    //
-    "<p> Are you ready to practice? Let's give it a try! </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> for 3 practice words",
-  ],
+  // Show buttons for clicking
+  show_clickable_nav: true,
+  // Show the amount of pages left
+  show_page_number: true,
+  // Also allow forwarding by keyboard
   key_forward: "Enter",
+  // Text on buttons
+  button_label_previous: "back",
+  button_label_next: "next",
   // Add information for easy data processing
   data: { data_type: "instructions" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    //
+    "<p> Let's have a look at the playing field (you won't have to do anything). <br> We'll explain everything after.",
+  ],
 };
 
 // SCREEN: Trial
@@ -149,13 +100,80 @@ var trial = {
   feedback_duration: 250,
 };
 
+// TIMELINE: instruction trials
+var timeline_instruction = {
+  timeline: [trial], // show the trials
+  timeline_variables: [{ target: "Chocolate", condition: "positive" }],
+  data: { data_type: "instructions" },
+}; // END timeline_instruction
+
+// SCREEN: Instructions
+var instructions_2 = {
+  type: "instructions",
+  // Show buttons for clicking
+  show_clickable_nav: true,
+  // Show the amount of pages left
+  show_page_number: true,
+  // Also allow forwarding by keyboard
+  key_forward: "Enter",
+  // Text on buttons
+  button_label_previous: "back",
+  button_label_next: "next",
+  // Add information for easy data processing
+  data: { data_type: "instructions" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    //
+    "<p> You just saw the playing field. It contains the following elements:",
+    "<p> The word 'Chocolate' is the word of interest: <br> what is the <b> first word </b> you think of when you read it?",
+    "<p> Type your first thought/association by using the keyboard <i>(a-z; backspace; space) </i>",
+    "<p> Did you notice that 'Chocolate' was shown in <b> green </b>? <br> It indicates that you should give a <b> positive </b> association (e.g. 'Sweet')",
+    "<p> If 'Chocolate' is shown in <b> red </b> we want you to give a <b> negative </b> association. (e.g., 'Unhealthy')",
+    "<p> The little colored balls show your <b> current score </b>. <br> In this example you had 20, but you'll start with 1.",
+    "<p> If you type a response <b> before </b> the target ('Chocolate') hits the bottom, you'll gain a point.",
+    "<p> If you're too late you'll lose a point. Let's see if you can achieve the maximum score!",
+    "<p> To keep things interesting: <br> the target will increase and decrease speed during the experiment.",
+    "<p> Now lets' try and give us the positive association that 'Chocolate' is 'Sweet'...",
+  ],
+};
+
+// SCREEN: Instructions
+var instructions_3 = {
+  type: "instructions",
+  // Show buttons for clicking
+  show_clickable_nav: true,
+  // Show the amount of pages left
+  show_page_number: true,
+  // Also allow forwarding by keyboard
+  key_forward: "Enter",
+  // Text on buttons
+  button_label_previous: "back",
+  button_label_next: "next",
+  // Add information for easy data processing
+  data: { data_type: "instructions" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    //
+    "<p> Good effort!",
+    "<p> Here are a few things to know before you get started: </p>",
+    "<p> 1. Type the <b> first </b> word/association that comes to mind.",
+    "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences).",
+    "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an').",
+    "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes.",
+    "<p> 5. Press the <b> Enter</b>-key to quickly submit your answer.",
+    "<p> You'll now be able to practice all of this with <b> 5 practice trials </b>",
+  ],
+};
+
 // TIMELINE: pratice trials
 var timeline_practice = {
   timeline: [trial], // show the trials
   timeline_variables: [
-    { target: "Chocolate", condition: "neutral" },
+    { target: "Chocolate", condition: "negative" },
     { target: "Bike", condition: "positive" },
     { target: "Balloon", condition: "negative" },
+    { target: "Pen", condition: "negative" },
+    { target: "Car", condition: "positive" },
   ],
   data: { data_type: "practice" },
   randomize_order: false,
@@ -203,11 +221,25 @@ var timeline_experiment = {
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
 timeline.push(
+  // First exposure (1 trial)
+  instructions,
+  initialize_experiment, // set adaptive parameters
+  timeline_instruction,
+  // Second exposure (1 trial)
+  instructions_2,
+  initialize_experiment, // set adaptive parameters
+  timeline_instruction,
+  // Third exposure (5 trials)
+  instructions_3,
+  initialize_experiment, // set adaptive parameters
+  timeline_practice
+
+  /*
   initialize_experiment,
   timeline_practice,
   instructions_start,
   initialize_experiment,
-  timeline_experiment
+  timeline_experiment*/
 );
 
 // INITIALIZE EXPERIMENT
