@@ -48,10 +48,6 @@
   line-height: 1.6em;
 }
 
-#html-response {
-  font-size: 30px;
-}
-
 /* Form elements like input fields and buttons */
 
 .jspsych-display-element input[type="text"] {

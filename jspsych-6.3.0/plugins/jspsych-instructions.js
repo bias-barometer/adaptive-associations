@@ -126,8 +126,7 @@ jsPsych.plugins.instructions = (function () {
       }
 
       if (trial.show_clickable_nav) {
-        var nav_html =
-          "<div class='jspsych-instructions-nav' style='padding: 10px 0px;'>";
+        var nav_html = "<div class='jspsych-instructions-nav'>";
         if (trial.allow_backward) {
           var allowed = current_page > 0 ? "" : "disabled='disabled'";
           nav_html +=

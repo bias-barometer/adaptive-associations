@@ -1,0 +1,10 @@
+/* increase font size of response */
+#html-response {
+  font-size: 30px;
+}
+
+/* Reposition instructions navigation bar */
+/* NOTE: remove intag styling from jspsych-instructions.js*/
+.jspsych-instructions-nav {
+  padding-top: 100px;
+}
