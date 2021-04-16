@@ -73,12 +73,12 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       dropspeed_step_size: {
         description:
-          "An integer describing the dropspeed adjustments (in milliseconds) to adjust dropspeed",
+          "An proportion integer describing the dropspeed adjustments (in proportion [0, 1]) to adjust dropspeed",
         pretty_name: "dropspeed_step_size",
         // Takes an integer as input
         type: jsPsych.plugins.parameterType.INT,
         // Defaults to relatively small changes
-        default: 50,
+        default: 0.1,
       },
 
       optimal_time: {
@@ -472,7 +472,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Lives are retained
         new_lives = trial.lives;
         // Drop speed is sped up
-        new_dropspeed = trial.dropspeed - trial.dropspeed_step_size;
+        new_dropspeed =
+          trial.dropspeed - trial.dropspeed * trial.dropspeed_step_size;
       } else if (
         (posY > trial.optimal_time) &
         (posY < trial.canvas_size_target[0])
@@ -494,7 +495,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         new_lives = trial.lives - 1;
         show_lives((n_lives = new_lives));
         // Drop speed is slowed down
-        new_dropspeed = trial.dropspeed + trial.dropspeed_step_size;
+        new_dropspeed =
+          trial.dropspeed + trial.dropspeed * trial.dropspeed_step_size;
       }
 
       // CHANGE STYLING - TARGET

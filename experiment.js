@@ -73,7 +73,7 @@ var trial = {
     return jsPsych.data.get().last(1).values()[0].new_dropspeed;
   },
   // Change in dropspeed after fast/slow answer
-  dropspeed_step_size: 50,
+  dropspeed_step_size: 0.1,
   // Optimal response position (i.e., no need to change dropspeed)
   // NOTE: this is in pixels, dependent on canvas target height
   optimal_time: 300,
