@@ -163,7 +163,8 @@ var instructions_3 = {
     "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences).",
     "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an').",
     "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes.",
-    "<p> 5. Press the <b> Enter</b>-key to quickly submit your answer.",
+    "<p> 5. If you <i> do not know the word </i> type <b> xxx </b> as your answer.",
+    "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer.",
     "<p> You'll now be able to practice all of this with <b> 5 practice trials </b>",
   ],
 };
@@ -202,7 +203,8 @@ var instructions_start = {
       "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences)." +
       "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an')." +
       "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes." +
-      "<p> 5. Press the <b> Enter</b>-key to quickly submit your answer." +
+      "<p> 5. If you <i> do not know the word </i> type <b> xxx </b> as your answer." +
+      "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer." +
       "<br><br> <i> Press the <b> Enter</b>-key to get started! </i>" +
       "</div>",
   ],
