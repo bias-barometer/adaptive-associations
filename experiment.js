@@ -8,6 +8,7 @@
 // SET-UP
 // Initialize timeline variable (required)
 var timeline = [];
+
 // Initialize variables that are re-used flexibly within trials
 var initialize_experiment = {
   // Basicly an empty function that is called but does not show anything on screen
@@ -101,11 +102,11 @@ var trial = {
 };
 
 // TIMELINE: instruction trials
-var timeline_instruction = {
+var timeline_instruction_trial = {
   timeline: [trial], // show the trials
   timeline_variables: [{ target: "Chocolate", condition: "positive" }],
   data: { data_type: "instructions" },
-}; // END timeline_instruction
+}; // END timeline_instruction_trial
 
 // SCREEN: Instructions
 var instructions_2 = {
@@ -129,13 +130,15 @@ var instructions_2 = {
     "<p> Type your first thought/association by using the keyboard <i>(a-z; backspace; space) </i>",
     "<p> Did you notice that 'Chocolate' was shown in <b> green </b>? <br> It indicates that you should give a <b> positive </b> association (e.g. 'Sweet')",
     "<p> If 'Chocolate' is shown in <b> red </b> we want you to give a <b> negative </b> association. (e.g., 'Unhealthy')",
-    "<p> The little colored balls show your <b> current score </b>. <br> In this example you had 20, but you'll start with 1.",
+    "<p> The little colored balls show your <b> current score</b>. <br> In this example you had 20, but you'll start with 1.",
     "<p> If you type a response <b> before </b> the target ('Chocolate') hits the bottom, you'll gain a point.",
-    "<p> If you're too late you'll lose a point. Let's see if you can achieve the maximum score!",
+    "<p> If you're too late you'll lose a point. <br> Let's see if you can achieve the maximum score!",
     "<p> To keep things interesting: <br> the target will increase and decrease speed during the experiment.",
     "<p> Now lets' try and give us the positive association that 'Chocolate' is 'Sweet'...",
   ],
 };
+
+// timeline_instruction_trial (repeated)
 
 // SCREEN: Instructions
 var instructions_3 = {
@@ -179,38 +182,90 @@ var timeline_practice = {
   randomize_order: false,
 }; // END all_trials
 
-// SCREEN: Start Experiment
+// SCREEN: Instructions
 var instructions_start = {
   type: "instructions",
+  // Show buttons for clicking
+  show_clickable_nav: false,
+  // Show the amount of pages left
+  show_page_number: false,
+  // Also allow forwarding by keyboard
   key_forward: "Enter",
-  pages: [
-    // Welcome
-    "<p> Well done! You are now ready for the real deal. </p>" +
-      "<br>" +
-      "<p> Remember: </p>" +
-      "<br>" +
-      "<p> You can only use lowercase letters (a-z) </p>" +
-      "<p> Use the <b> backspace </b> to correct typing errors </p>" +
-      "<br>" +
-      "<p> Only type 1 or 2 words (no sentences) </p>" +
-      "<p> Each word should contain more than 2 characters (no 'a' or 'an') </p>" +
-      "<br>" +
-      "<p> Press <b> Enter </b> to get started",
-  ],
   // Add information for easy data processing
   data: { data_type: "instructions" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    //
+    "<div style = 'text-align: left;'>" + // align text left for pretty list.
+      "You are now ready to start the game: <br>" +
+      "<p> 1. Type the <b> first </b> word/association that comes to mind." +
+      "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences)." +
+      "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an')." +
+      "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes." +
+      "<p> 5. Press the <b> Enter</b>-key to quickly submit your answer." +
+      "<br><br> <i> Press the <b> Enter</b>-key to get started! </i>" +
+      "</div>",
+  ],
 };
 
-// TIMELINE: experiment trials
+// TIMELINE: EXPERIMENT
+var loop_counter = 1; // set global variable
+
 var timeline_experiment = {
-  timeline: [trial], // show the trials
-  timeline_variables: target_stimuli,
-  data: { data_type: "experiment" },
-  sample: {
-    type: "without-replacement",
-    size: 10, // 10 trials
+  // show the canvas-keyboard trials as defined above
+  timeline: [trial],
+  // Select a random set of stimulus words per participant
+  // NOTE: sourced from `stimuli.js`
+  // NOTE: specify function below so that is called only once each experiment.
+  timeline_variables: sampleStimuli((n_unique = 3)), // number of stimulus words to sample
+  // Present the trials in a random order
+  randomize_order: true,
+  // NOTE: A loop is always executed once, so reduce desired number of repetitions by 1
+  loop_function: function () {
+    // Desired number of repetitions
+    if (loop_counter < 3) {
+      loop_counter = loop_counter + 1; // increase loop counter to prevent infinite loop
+      return true; // continues with the next loop
+    } else {
+      return false; // discontinues the loop
+    }
   },
-}; // END all_trials
+  // save for easy data processing
+  data: { data_type: "experiment" },
+};
+
+// Custom function for sampling the required stimuli
+function sampleStimuli(n_unique) {
+  // Sample a subset of stimuli (`target` parameter only)
+  const selected_stimuli = jsPsych.randomization.sampleWithoutReplacement(
+    target_stimuli,
+    n_unique
+  );
+
+  // CONDITIONS
+  // Each word needs to be presented in a positive and negative condition
+  // Create these trials now.
+
+  // Positive condition
+  // SOURCE for deepcloning arrays: https://www.freecodecamp.org/news/how-to-clone-an-array-in-javascript-1d3183468f6a/
+  var positive_trials = JSON.parse(JSON.stringify(selected_stimuli)); // duplicate array
+  // Add the positive condition info
+  positive_trials.forEach(function (stimulus) {
+    stimulus.condition = "positive";
+  });
+
+  // Negative condition
+  let negative_trials = JSON.parse(JSON.stringify(selected_stimuli)); // duplicate array
+  // Add the negative condition info
+  negative_trials.forEach(function (stimulus) {
+    stimulus.condition = "negative";
+  });
+
+  // Return the combination of positive & negative trials
+  // Order will be randomized.
+  combined_trials = [].concat(positive_trials, negative_trials);
+  return combined_trials;
+}
 
 // COMPILE EXPERIMENT
 // (Required)
@@ -221,25 +276,23 @@ var timeline_experiment = {
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
 timeline.push(
+  /*
   // First exposure (1 trial)
   instructions,
   initialize_experiment, // set adaptive parameters
-  timeline_instruction,
+  timeline_instruction_trial,
   // Second exposure (1 trial)
   instructions_2,
   initialize_experiment, // set adaptive parameters
-  timeline_instruction,
+  timeline_instruction_trial,
   // Third exposure (5 trials)
   instructions_3,
   initialize_experiment, // set adaptive parameters
-  timeline_practice
-
-  /*
-  initialize_experiment,
-  timeline_practice,
+  timeline_practice,*/
+  // The experiment
   instructions_start,
-  initialize_experiment,
-  timeline_experiment*/
+  initialize_experiment, // set adaptive parameters
+  timeline_experiment
 );
 
 // INITIALIZE EXPERIMENT
