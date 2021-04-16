@@ -576,6 +576,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
           optimal_RT_px: trial.optimal_time,
           // Response time in pixels (0 is top)
           RT_px: posY,
+          // Response time in ms
+          RT_ms: all_responses.pop().rt,
           // Whether the response was fast, optimal, or slow
           speed_category: answer_speed,
           // Dropspeed with which the target moved across the canvas
