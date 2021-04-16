@@ -426,7 +426,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       if ((n_words == 1) | (n_words == 2)) {
         // Correct number of words - check characters
-        if (n_characters >= 2) {
+        if (n_characters > 2) {
           // VALID answers
           validation = {
             valid: true,
