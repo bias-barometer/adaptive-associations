@@ -21,7 +21,8 @@
 /* The score are displayed as a number; padding ensures space between
 text and bar */
 #score-text {
-  font-size: 20px;
+  font-size: 18px; /* like all other text components */
+  font-family: "Open Sans", "Arial", sans-serif;
   vertical-align: top;
   text-align: center;
   height: 100%;
