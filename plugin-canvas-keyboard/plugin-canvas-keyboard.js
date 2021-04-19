@@ -558,6 +558,12 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Show feedback
       show_feedback();
 
+      // Last RT
+      if (all_responses.length === 0) {
+        var last_RT = 0;
+      } else {
+        var last_RT = all_responses.pop().rt;
+      }
       // End trial after showing the feedback for a few milliseconds
       jsPsych.pluginAPI.setTimeout(function () {
         // clear the display
@@ -577,7 +583,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
           // Response time in pixels (0 is top)
           RT_px: posY,
           // Response time in ms
-          RT_ms: all_responses.pop().rt,
+          RT_ms: last_RT,
           // Whether the response was fast, optimal, or slow
           speed_category: answer_speed,
           // Dropspeed with which the target moved across the canvas

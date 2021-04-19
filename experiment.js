@@ -278,7 +278,6 @@ function sampleStimuli(n_unique) {
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
 timeline.push(
-  /*
   // First exposure (1 trial)
   instructions,
   initialize_experiment, // set adaptive parameters
@@ -290,7 +289,7 @@ timeline.push(
   // Third exposure (5 trials)
   instructions_3,
   initialize_experiment, // set adaptive parameters
-  timeline_practice,*/
+  timeline_practice,
   // The experiment
   instructions_start,
   initialize_experiment, // set adaptive parameters
