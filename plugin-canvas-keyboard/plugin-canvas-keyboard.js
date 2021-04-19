@@ -49,7 +49,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         default: [500, 500],
       },
 
-      canvas_size_lives: {
+      canvas_size_score: {
         description:
           "Array containing the height (first value) and width (second value) of the canvas element.",
         pretty_name: "canvas_size",
@@ -90,19 +90,19 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Do not provide a default as it is largely dependent on the styling
       },
 
-      // LIVES
-      experiment_lives: {
-        description: "The number of lives overall provided in the experiment",
-        pretty_name: "experiment_lives",
+      // score
+      total_trials: {
+        description: "The number of score overall provided in the experiment",
+        pretty_name: "total_trials",
         // Take an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        // Default to all lives (N = 20),
+        // Default to all score (N = 20),
         default: 20,
-      }, // END lives
+      }, // END score
 
-      lives: {
-        description: "The number of lives left in this trial to show on screen",
-        pretty_name: "lives",
+      score: {
+        description: "The number of score left in this trial to show on screen",
+        pretty_name: "score",
         // Take an integer as input
         type: jsPsych.plugins.parameterType.INT,
         // Do not provide a default
@@ -170,7 +170,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
     // FEEDBACK
     // Initialize variables globally for later use
     var answer_speed = "";
-    var new_lives = null;
+    var new_score = null;
     var new_dropspeed = null;
 
     // CREATE SCREENS
@@ -197,22 +197,33 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "</canvas>" +
         "</div>";
 
-      // Canvas element for lives
-      lives_html =
-        "<div id = 'lives'>" +
-        "<canvas id='canvas-lives'" +
-        // Draw a black border around the canvas
-        "style='border:1px solid #000000;' " +
+      // Canvas element for score
+      // NOTE: duplicate from the "progress bar" in jspsych.js
+
+      score_html =
+        "<div id = 'score-container' style = '" +
+        // determine size
         // Set hight (from trial info - defaults to 100)
-        "height='" +
-        trial.canvas_size_lives[0] +
-        "'" +
+        "height: " +
+        trial.canvas_size_score[0] +
+        "px; " +
         // Set width (from trial info)
-        "width='" +
-        trial.canvas_size_lives[1] +
-        "'" +
-        ">" +
-        "</canvas></div><br>";
+        "width: " +
+        trial.canvas_size_score[1] +
+        "px'>" +
+        // Start with 1 life
+        "<div id = 'score-text'>" +
+        "400" +
+        "</div>" +
+        // Show score in bar
+        // Background
+        "<div id = 'score-background'>" +
+        // Fill
+        "<div id = 'score'>" +
+        // close all
+        "</div>" +
+        "</div>" +
+        "</div>";
 
       // Display the participants typed responses
       response_html = "<div id='html-response'>" + "_" + "</div> <br>";
@@ -233,51 +244,34 @@ jsPsych.plugins["canvas-keys"] = (function () {
       return (
         instruction_html +
         target_html +
-        lives_html +
+        score_html +
         response_html +
         continue_html +
         feedback_html
       );
     } // END initalize_screens
 
-    // SHOW LIVES
-    function show_lives(n_lives) {
-      // SET PARAMETERS
-      // NOTE: upper-left corner: (x = 0, y = 0)
-      var margin = 5; // space between borders of the circles
-      var canvas_width = trial.canvas_size_lives[1]; // defined in trial
-      // compute left over space taking into account the margins
-      var margin_width = (trial.experiment_lives + 2) * margin;
-      // Compute size of the lives (rounded down to whole pixels)
-      var life_width = Math.floor(
-        (canvas_width - margin_width) / trial.experiment_lives
-      );
+    // SHOW score
+    function show_score(score) {
+      if (score < 1) {
+        // CAP TO 0
+        // Update styling (bar)
+        document.getElementById("score").style.width = 0 + "%";
+        // Update score (text)
+        document.getElementById("score-text").innerHTML = 0;
+      } else {
+        // Total trials (numeric)
+        var total_trials = parseInt(trial.total_trials) + 1;
 
-      // Circle size in the width determines the canvasses' height.
-      var canvas_height = life_width + margin * 2; // add space between border
-      document.getElementById("canvas-lives").height = canvas_height;
+        // Computer score as percentage of total score/trials
+        var score_percentage = Math.min((score / total_trials) * 100, 100);
 
-      // INITIALIZE
-      // Access the canvas element
-      var canvas = document.getElementById("canvas-lives");
-      // Get the 2D context
-      var ctx = canvas.getContext("2d");
-
-      // DRAW LIVES
-      for (i = 1; i <= n_lives; i++) {
-        // compute indeces
-        life_x = (i - 0.5) * life_width + i * 5;
-        life_y = canvas_height / 2;
-        // DRAW CIRCLE
-        // Set a custom fill color
-        ctx.fillStyle = available_colors[i - 1]; // i- 1 because index starts at 0
-        // arc(x, y, r, startangle, endangle)
-        ctx.beginPath();
-        ctx.arc(life_x, life_y, life_width / 2, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.stroke();
+        // Update styling (bar)
+        document.getElementById("score").style.width = score_percentage + "%";
+        // Update score (text)
+        document.getElementById("score-text").innerHTML = score;
       }
-    } // END show_lives
+    } // END show_score
 
     // SHOW TARGET
     function show_target(posX, posY) {
@@ -469,8 +463,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // FAST ANSWER
         // Store speed
         answer_speed = "fast";
-        // Lives are retained
-        new_lives = trial.lives;
+        // score in increased
+        new_score = trial.score + 1;
         // Drop speed is sped up
         new_dropspeed =
           trial.dropspeed - trial.dropspeed * trial.dropspeed_step_size;
@@ -481,8 +475,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // OPTIMAL ANSWER
         // Store speed
         answer_speed = "optimal";
-        // Lives are retained
-        new_lives = trial.lives;
+        // score is increased
+        new_score = trial.score + 1;
         // Drop speed is retained
         new_dropspeed = trial.dropspeed;
       } else if (posY >= trial.canvas_size_target[0]) {
@@ -491,13 +485,15 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // ... left the screen
         // Store speed
         answer_speed = "slow";
-        // A life is lost
-        new_lives = trial.lives - 1;
-        show_lives((n_lives = new_lives));
+        // Score is decreased
+        new_score = trial.score - 1;
         // Drop speed is slowed down
         new_dropspeed =
           trial.dropspeed + trial.dropspeed * trial.dropspeed_step_size;
       }
+
+      // SHOW NEW SCORE
+      show_score((score = new_score));
 
       // CHANGE STYLING - TARGET
       if (answer_speed == "slow") {
@@ -516,8 +512,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Show screen elements
       display_element.innerHTML = initialize_screens();
 
-      // Show lives
-      show_lives((n_lives = trial.lives));
+      // Show score
+      show_score((score = trial.score));
 
       // Add Keyboard Listeners
       // Listen to each and every key press an participant makes
@@ -590,12 +586,12 @@ jsPsych.plugins["canvas-keys"] = (function () {
           dropspeed: trial.dropspeed,
           // Adjusted dropspeed - dependent on speed_category
           new_dropspeed: new_dropspeed,
-          // Number of lives with which the experiment was started
-          experiment_lives: trial.experiment_lives,
-          // Number of lives in the current trial
-          lives: trial.lives,
-          // Number of lives after the trial - dependent on speed_category
-          new_lives: new_lives,
+          // Number of score with which the experiment was started
+          total_trials: trial.total_trials,
+          // Number of score in the current trial
+          score: trial.score,
+          // Number of score after the trial - dependent on speed_category
+          new_score: new_score,
           // The provided responses / association as one word
           association: visible_responses.join(""),
           // Each keystroke including timing

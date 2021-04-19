@@ -18,7 +18,7 @@ var initialize_experiment = {
   // Save the required data that is fed into the first trial.
   data: {
     new_dropspeed: 300,
-    new_lives: 20,
+    new_score: 1,
     data_type: "initialize",
   },
 };
@@ -62,9 +62,9 @@ var trial = {
   // CANVAS STYLING
   canvas_size_target: [375, 600],
   // Size of the canvas where the lived are displayed [height, width]
-  // NOTE: for pretty styling keep width of target & lives canvas the same
-  // NOTE: the number of included lives determines the ultimate height of this canvas
-  canvas_size_lives: [100, 600],
+  // NOTE: for pretty styling keep width of target & score canvas the same
+  // NOTE: the number of included score determines the ultimate height of this canvas
+  canvas_size_score: [20, 600],
 
   // TIMING
   // The time whith which the target frames are updated (i.e., dropspeed)
@@ -78,14 +78,14 @@ var trial = {
   // NOTE: this is in pixels, dependent on canvas target height
   optimal_time: 300,
 
-  // LIVES
-  // Number of lives to display (in first trial)
-  // Fixes the styling between trials
-  experiment_lives: 20,
-  // Number of lives to display in this trial
+  // SCORE
+  // Maximum number of trials
+  // Score is visualized as a percentage of the maximum score
+  total_trials: jsPsych.timelineVariable("total_trials"),
+  // Score to display in this trial
   // NOTE: variable dependent on the last saved data (i.e., last response)
-  lives: function () {
-    return jsPsych.data.get().last(1).values()[0].new_lives;
+  score: function () {
+    return jsPsych.data.get().last(1).values()[0].new_score;
   },
 
   // RESPONSES
@@ -104,7 +104,9 @@ var trial = {
 // TIMELINE: instruction trials
 var timeline_instruction_trial = {
   timeline: [trial], // show the trials
-  timeline_variables: [{ target: "Chocolate", condition: "positive" }],
+  timeline_variables: [
+    { target: "Chocolate", condition: "positive", total_trials: "1" },
+  ],
   data: { data_type: "instructions" },
 }; // END timeline_instruction_trial
 
@@ -173,11 +175,11 @@ var instructions_3 = {
 var timeline_practice = {
   timeline: [trial], // show the trials
   timeline_variables: [
-    { target: "Chocolate", condition: "negative" },
-    { target: "Bike", condition: "positive" },
-    { target: "Balloon", condition: "negative" },
-    { target: "Pen", condition: "negative" },
-    { target: "Car", condition: "positive" },
+    { target: "Chocolate", condition: "negative", total_trials: "5" },
+    { target: "Bike", condition: "positive", total_trials: "5" },
+    { target: "Balloon", condition: "negative", total_trials: "5" },
+    { target: "Pen", condition: "negative", total_trials: "5" },
+    { target: "Car", condition: "positive", total_trials: "5" },
   ],
   data: { data_type: "practice" },
   randomize_order: false,
@@ -219,7 +221,11 @@ var timeline_experiment = {
   // Select a random set of stimulus words per participant
   // NOTE: sourced from `stimuli.js`
   // NOTE: specify function below so that is called only once each experiment.
-  timeline_variables: sampleStimuli((n_unique = 3)), // number of stimulus words to sample
+  timeline_variables: sampleStimuli(
+    (n_unique = 3),
+    (n_loops = 3),
+    (n_conditions = 2)
+  ), // number of stimulus words to sample
   // Present the trials in a random order
   randomize_order: true,
   // NOTE: A loop is always executed once, so reduce desired number of repetitions by 1
@@ -237,13 +243,15 @@ var timeline_experiment = {
 };
 
 // Custom function for sampling the required stimuli
-function sampleStimuli(n_unique) {
+// n_unique: number of target words to sample
+// n_loops: number of times each target-condition is presented
+// n_condition: number of valence conditions (positive, negative, ...)
+function sampleStimuli(n_unique, n_loops, n_conditions) {
   // Sample a subset of stimuli (`target` parameter only)
   const selected_stimuli = jsPsych.randomization.sampleWithoutReplacement(
     target_stimuli,
     n_unique
   );
-
   // CONDITIONS
   // Each word needs to be presented in a positive and negative condition
   // Create these trials now.
@@ -254,6 +262,8 @@ function sampleStimuli(n_unique) {
   // Add the positive condition info
   positive_trials.forEach(function (stimulus) {
     stimulus.condition = "positive";
+    // Save number of total trials
+    stimulus.total_trials = n_unique * n_loops * n_conditions;
   });
 
   // Negative condition
@@ -261,6 +271,8 @@ function sampleStimuli(n_unique) {
   // Add the negative condition info
   negative_trials.forEach(function (stimulus) {
     stimulus.condition = "negative";
+    // Save number of total trials
+    stimulus.total_trials = n_unique * n_loops * n_conditions;
   });
 
   // Return the combination of positive & negative trials
@@ -278,11 +290,13 @@ function sampleStimuli(n_unique) {
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
 timeline.push(
+  /*
   // First exposure (1 trial)
   instructions,
   initialize_experiment, // set adaptive parameters
   timeline_instruction_trial,
   // Second exposure (1 trial)
+
   instructions_2,
   initialize_experiment, // set adaptive parameters
   timeline_instruction_trial,
@@ -292,6 +306,7 @@ timeline.push(
   timeline_practice,
   // The experiment
   instructions_start,
+  */
   initialize_experiment, // set adaptive parameters
   timeline_experiment
 );
