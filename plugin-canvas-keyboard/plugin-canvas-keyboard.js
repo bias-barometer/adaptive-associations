@@ -253,24 +253,16 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
     // SHOW score
     function show_score(score) {
-      if (score < 1) {
-        // CAP TO 0
-        // Update styling (bar)
-        document.getElementById("score").style.width = 0 + "%";
-        // Update score (text)
-        document.getElementById("score-text").innerHTML = 0;
-      } else {
-        // Total trials (numeric)
-        var total_trials = parseInt(trial.total_trials) + 1;
+      // Total trials (numeric)
+      var total_trials = parseInt(trial.total_trials) + 1;
 
-        // Computer score as percentage of total score/trials
-        var score_percentage = Math.min((score / total_trials) * 100, 100);
+      // Computer score as percentage of total score/trials
+      var score_percentage = Math.min((score / total_trials) * 100, 100);
 
-        // Update styling (bar)
-        document.getElementById("score").style.width = score_percentage + "%";
-        // Update score (text)
-        document.getElementById("score-text").innerHTML = score;
-      }
+      // Update styling (bar)
+      document.getElementById("score").style.width = score_percentage + "%";
+      // Update score (text)
+      document.getElementById("score-text").innerHTML = score;
     } // END show_score
 
     // SHOW TARGET
@@ -498,8 +490,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // ... left the screen
         // Store speed
         answer_speed = "slow";
-        // Score is decreased
-        new_score = trial.score - 1;
+        // Score is decreased (but cannot drop below 0)
+        new_score = Math.max(trial.score - 1, 0);
         // Drop speed is slowed down
         new_dropspeed =
           trial.dropspeed + trial.dropspeed * trial.dropspeed_step_size;
