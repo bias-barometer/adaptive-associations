@@ -184,7 +184,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "<div id='target'>" +
         "<canvas id='canvas-target' " +
         // Draw a black border around the canvas
-        "style='border:1px solid #000000; " +
+        "style=' " +
         // Set height (from trial info)
         "height: " +
         trial.canvas_size_target[0] +
