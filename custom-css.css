@@ -5,6 +5,11 @@
   padding-top: 100px;
 }
 
+#html-continue {
+  padding-top: 14px;
+  font-size: 14px;
+}
+
 /* TARGET */
 #canvas-target {
   border: 2px solid #000000;
@@ -58,4 +63,8 @@ text and bar */
 /* FEEDBACK */
 span {
   font-weight: bold;
+}
+
+#html-feedback {
+  font-size: 14px;
 }

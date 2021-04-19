@@ -40,7 +40,7 @@ var instructions = {
   // Individual pages / slides with HTML markup
   pages: [
     //
-    "<p> Let's have a look at the playing field (you won't have to do anything). <br> We'll explain everything after.",
+    "<p> Let's have a look at the playing field <i>(you won't have to do anything)</i>. <br> We'll explain what you see after.",
   ],
 };
 
@@ -128,15 +128,20 @@ var instructions_2 = {
   pages: [
     //
     "<p> You just saw the playing field. It contains the following elements:",
-    "<p> The word 'Chocolate' is the word of interest: <br> what is the <b> first word </b> you think of when you read it?",
-    "<p> Type your first thought/association by using the keyboard <i>(a-z; backspace; space) </i>",
-    "<p> Did you notice that 'Chocolate' was shown in <b> green </b>? <br> It indicates that you should give a <b> positive </b> association (e.g. 'Sweet')",
-    "<p> If 'Chocolate' is shown in <b> red </b> we want you to give a <b> negative </b> association. (e.g., 'Unhealthy')",
-    "<p> The little colored balls show your <b> current score</b>. <br> In this example you had 20, but you'll start with 1.",
-    "<p> If you type a response <b> before </b> the target ('Chocolate') hits the bottom, you'll gain a point.",
-    "<p> If you're too late you'll lose a point. <br> Let's see if you can achieve the maximum score!",
-    "<p> To keep things interesting: <br> the target will increase and decrease speed during the experiment.",
-    "<p> Now lets' try and give us the positive association that 'Chocolate' is 'Sweet'...",
+    "<p> The moving word 'Chocolate' is the word of interest: <br> What is the <b> first word </b> you think of when you read it?",
+    "<p> Type your first thought/association by using the keyboard <br><i>(a-z; backspace; space)</i>",
+    "<p> Did you notice that 'Chocolate' was shown in <span style = 'color: rgba(0, 158, 115, 1)'>green</span>? <br> " +
+      "It indicates that you should give a <span style = 'color: rgba(0, 158, 115, 1)'> positive </span> association (e.g. 'Sweet').",
+    "<p> If 'Chocolate' is shown in <span style = 'color: rgba(213, 94, 0, 1)'>red</span> we want you to give a " +
+      "<span style = 'color: rgba(213, 94, 0, 1)'> negative </span> association (e.g., 'Unhealthy').",
+    "<p> Your <b> current score </b> is shown by the number and the yellow bar." +
+      "<br> In this example you had 1 point (yellow) but the maximum score (grey) was 2 points.",
+    "<p> If you type a response <b> before </b> the target ('Chocolate') hits the bottom, you'll <b> gain </b> a point. <br>" +
+      "<p> If you're too late you'll lose a point. ",
+    "<p> Achieving the maximum score is not easy: <br>" +
+      "The target will <b> increase and descrease speed </b> during the game.",
+    "<p> When you start typing on the keyboard it will show up below the score bar.",
+    "<p> Now lets' try and give the positive association that 'Chocolate' is 'Sweet'...",
   ],
 };
 
@@ -164,10 +169,11 @@ var instructions_3 = {
     "<p> 1. Type the <b> first </b> word/association that comes to mind.",
     "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences).",
     "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an').",
-    "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes.",
-    "<p> 5. If you <i> do not know the word </i> type <b> xxx </b> as your answer.",
+    "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
+      "We check your answer to make sure it is <b> US English </b>",
+    "<p> 5. If you do <b> not</b> know the word type <b> xxx </b> as your answer.",
     "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer.",
-    "<p> You'll now be able to practice all of this with <b> 5 practice trials </b>",
+    "<p> You'll now be able to practice with <b> 5 practice trials </b>",
   ],
 };
 
@@ -204,8 +210,9 @@ var instructions_start = {
       "<p> 1. Type the <b> first </b> word/association that comes to mind." +
       "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences)." +
       "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an')." +
-      "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes." +
-      "<p> 5. If you <i> do not know the word </i> type <b> xxx </b> as your answer." +
+      "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
+      "We check your answer to make sure it is <b> US English </b>" +
+      "<p> 5. If you do <b> not</b> know the word type <b> xxx </b> as your answer." +
       "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer." +
       "<br><br> <i> Press the <b> Enter</b>-key to get started! </i>" +
       "</div>",
@@ -357,7 +364,7 @@ var EoE_normal = {
     },
   ],
   conditional_function: function () {
-    if (continous_mistakes > 3) {
+    if (continous_mistakes < 3) {
       return true;
     } else {
       return false;
@@ -374,7 +381,6 @@ var EoE_normal = {
 // timeline.push(instructions_start);
 // timeline.push(timeline_experiment);
 timeline.push(
-  /*
   // First exposure (1 trial)
   instructions,
   initialize_experiment, // set adaptive parameters
@@ -390,11 +396,11 @@ timeline.push(
   timeline_practice,
   // The experiment
   instructions_start,
-  */
   initialize_experiment, // set adaptive parameters
   timeline_experiment,
   // End of Experiment
-  EoE_mistakes
+  EoE_mistakes,
+  EoE_normal
 );
 
 // INITIALIZE EXPERIMENT

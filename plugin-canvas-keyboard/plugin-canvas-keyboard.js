@@ -232,15 +232,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Display the participants typed responses
       response_html = "<div id='html-response'>" + "_" + "</div> <br>";
 
-      // Display the instruction so that participants know which
-      // key to press to continue to the next trial.
-      continue_html =
-        "<div id='html-continue'>" +
-        "Press <b>" +
-        trial.end_key +
-        "</b> to continue" +
-        "</div> <br> <br>";
-
       // Display the answer feedback in case a wrong answer is provided
       feedback_html =
         "<div id='html-feedback'>" +
@@ -250,14 +241,23 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "with more than <span id='n_characters'> 2 characters. </span>" +
         "</div>";
 
+      // Display the instruction so that participants know which
+      // key to press to continue to the next trial.
+      continue_html =
+        "<div id='html-continue'>" +
+        "<i>Press <b>" +
+        trial.end_key +
+        "</b> to continue </i>" +
+        "</div>";
+
       // RETURN
       return (
         instruction_html +
         target_html +
         score_html +
         response_html +
-        continue_html +
-        feedback_html
+        feedback_html +
+        continue_html
       );
     } // END initalize_screens
 
