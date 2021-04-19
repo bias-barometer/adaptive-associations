@@ -17,7 +17,7 @@ var initialize_experiment = {
   func: function () {},
   // Save the required data that is fed into the first trial.
   data: {
-    new_dropspeed: 100,
+    new_dropspeed: 300,
     new_score: 1,
     data_type: "initialize",
   },

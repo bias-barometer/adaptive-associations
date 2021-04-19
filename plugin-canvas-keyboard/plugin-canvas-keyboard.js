@@ -160,6 +160,10 @@ jsPsych.plugins["canvas-keys"] = (function () {
     all_response_keys.push("backspace"); // add backspace for error correction
     all_response_keys.push(trial.end_key); // add the key that signals the end of the trial (enter)
 
+    // VALID WORDS
+    // Add the "unkown word" response "xxx" to the list of valid words
+    valid_words.push("xxx");
+
     // ANIMATION
     // The number of pixels the target should drop each framerate
     // Lower numbers ensure smoother transitions
@@ -235,10 +239,16 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "Press <b>" +
         trial.end_key +
         "</b> to continue" +
-        "</div>";
+        "</div> <br> <br>";
 
       // Display the answer feedback in case a wrong answer is provided
-      feedback_html = "<div id='html-feedback'></div>";
+      feedback_html =
+        "<div id='html-feedback'>" +
+        "A <span id='validity'> valid </span> responses contains " +
+        "<span id='n_words'> 1 or 2 words </span> " +
+        "in <span id='us_english'> US English </span> " +
+        "with more than <span id='n_characters'> 2 characters. </span>" +
+        "</div>";
 
       // RETURN
       return (
@@ -356,14 +366,17 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Ensure that correct answer is given
         var valid_response = validate_response();
 
-        if (valid_response.valid) {
+        if (valid_response) {
           // End the trial because a valid response was given
           end_trial();
-        } else {
+        }
+        /*
+        else {
           // Provide an alert message to indicate the need for a valid response
           document.getElementById("html-feedback").innerHTML =
             "<i>" + valid_response.message + "</i>";
         } // END IF validate response
+        */
       } else if (jsPsych.pluginAPI.compareKeys(info.key, "backspace")) {
         // Remove the last letter entered to resemble a backspace action
         visible_responses.pop();
@@ -383,7 +396,22 @@ jsPsych.plugins["canvas-keys"] = (function () {
     // An answer may only be submitted if:
     // It contains one to two words
     // Each word contains more than two characters
+    // It is recognized as US English
+    // Is the "xxx" do not know the word
+
+    /* // Show feedback in the form of color coded text (included in feedback_html)
+        "A <span id='validity'> valid </span> responses contains " +
+        "<span id='n_words'> 1 or 2 </span> " +
+        "<span id='us_english'> US English </span> words with at least " +
+        "<span id='n_characters'> 3 characters</span>.";*/
+
     function validate_response() {
+      var valid_answer = true;
+
+      // SET COLORS
+      var invalid = "rgba(213, 94, 0, 1)"; // red
+      var valid = "rgba(0, 158, 115, 1)"; // green
+
       // CLEAN ANSWER
       // Get the total answer string
       var answer = visible_responses.join("");
@@ -393,13 +421,22 @@ jsPsych.plugins["canvas-keys"] = (function () {
       answer = answer.replace(/\s+/g, " ");
       // Remove any leading or trailing spaces
       answer = answer.trim();
+
       // N WORDS
       // Detect the number of words that are left when the string is split by spaces
       if (answer == "") {
-        var n_words = 0;
+        document.getElementById("n_words").style.color = invalid;
+        valid_answer = false;
       } else {
         var n_words = answer.split(" ").length;
-      }
+
+        if ((n_words == 1) | (n_words == 2)) {
+          document.getElementById("n_words").style.color = valid;
+        } else {
+          document.getElementById("n_words").style.color = invalid;
+          valid_answer = false;
+        } // END IF n_words
+      } // END IF answer
 
       // N CHARACTERS
       // Detect the number of characters per word
@@ -418,6 +455,49 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // NOTE: for applying Math.min to an array the three ... are necessary
       n_characters = Math.min(...n_characters_per_word);
 
+      if (n_characters > 2) {
+        // All words have sufficient characters
+        document.getElementById("n_characters").style.color = valid;
+      } else {
+        // One of the words has insufficient characters
+        document.getElementById("n_characters").style.color = invalid;
+        valid_answer = false;
+      }
+
+      // US ENGLISH
+      // A word should be US english
+
+      // Initialize
+      var us_english_per_word = [];
+
+      // Loop over words
+      for (var w in words) {
+        // Store the number of characters in each word
+        us_english_per_word.push(valid_words.includes(words[w]));
+      }
+
+      // Check if all words are US english
+      if (us_english_per_word.every((w) => w === true)) {
+        // all words are included in the valid_words.js list
+        document.getElementById("us_english").style.color = valid;
+      } else {
+        // one or more of the words were not US english
+        document.getElementById("us_english").style.color = invalid;
+        valid_answer = false;
+      }
+
+      // VALIDATION
+      // Show feedback in the form of color coded text
+      if (valid_answer) {
+        document.getElementById("validity").style.color = valid;
+      } else {
+        // one of the criteria was invalid
+        document.getElementById("validity").style.color = invalid;
+      }
+
+      return valid_answer;
+
+      /*
       // VALIDATION
       // The answer should have the correct numbers of words (1 - 2)
       // AND
@@ -426,11 +506,21 @@ jsPsych.plugins["canvas-keys"] = (function () {
       if ((n_words == 1) | (n_words == 2)) {
         // Correct number of words - check characters
         if (n_characters > 2) {
-          // VALID answers
-          validation = {
-            valid: true,
-            message: "", // no feedback to display
-          };
+          // VALID WORD
+          if (valid_words.includes(answer)) {
+            // VALID answers
+            validation = {
+              valid: true,
+              message: "", // no feedback to display
+            };
+          } else {
+            // Non-word typed
+            validation = {
+              valid: false,
+              message:
+                "This is not an <b> US English </b> word. Use <b> backspace </b> to correct typing errors.", // diplay feedback
+            };
+          }
         } else {
           // Insufficient number of characters
           validation = {
@@ -454,6 +544,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       } // END IF n_words
 
       return validation;
+      */
     } // END validate_response
 
     // SHOW FEEDBACK
