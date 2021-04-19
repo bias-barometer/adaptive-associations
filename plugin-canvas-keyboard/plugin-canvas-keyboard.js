@@ -184,16 +184,16 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "<div id='target'>" +
         "<canvas id='canvas-target' " +
         // Draw a black border around the canvas
-        "style='border:1px solid #000000;' " +
+        "style='border:1px solid #000000; " +
         // Set height (from trial info)
-        "height='" +
+        "height: " +
         trial.canvas_size_target[0] +
-        "'" +
+        "px; " +
         // Set width (from trial info)
-        "width='" +
+        "width: " +
         trial.canvas_size_target[1] +
-        "'" +
-        ">" +
+        "px;" +
+        "'>" +
         "</canvas>" +
         "</div>";
 
@@ -274,13 +274,27 @@ jsPsych.plugins["canvas-keys"] = (function () {
     } // END show_score
 
     // SHOW TARGET
-    function show_target(posX, posY) {
+    function show_target(posY) {
       // INITIALIZE
+      // SOURCE: https://www.html5rocks.com/en/tutorials/canvas/hidpi/
+      // Goal: scale the canvas to deal with high definition screens
       // Access the canvas element
       var canvas = document.getElementById("canvas-target");
-      // Get the 2D context
-      var ctx = canvas.getContext("2d");
+      // Get the device pixel ratio, falling back to 1.
+      var dpr = window.devicePixelRatio || 1;
+      // Get the size of the canvas in CSS pixels.
+      var rect = canvas.getBoundingClientRect();
+      // Give the canvas pixel dimensions of their CSS
+      // size * the device pixel ratio.
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
 
+      var ctx = canvas.getContext("2d");
+      // Scale all drawing operations by the dpr, so you
+      // don't have to worry about the difference.
+      ctx.scale(dpr, dpr);
+
+      // canvas.getContext("2d");
       // CLEAR CANVAS
       // clear existing canvas otherwise a trial of elements gets painted
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -295,9 +309,9 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // All other cases is black
         ctx.fillStyle = "#000000";
       }
-      ctx.font = "bold 25px Courier New";
+      ctx.font = "bold 18px Courier New";
       ctx.textAlign = "center"; // center on x,y coordinates
-      ctx.fillText(trial.target, posX, posY);
+      ctx.fillText(trial.target, canvas.width / dpr / 2, posY);
     } // END show_target
 
     // ANIMATE TARGET
@@ -307,7 +321,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // UPDATE TEXT
       show_target(
         // posX is constant = centralized
-        trial.canvas_size_target[1] / 2,
         // posY updated with step_size
         posY
       );
