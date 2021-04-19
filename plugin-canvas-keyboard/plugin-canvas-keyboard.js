@@ -473,6 +473,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Drop speed is sped up
         new_dropspeed =
           trial.dropspeed - trial.dropspeed * trial.dropspeed_step_size;
+        // Reset continuous mistakes
+        continous_mistakes = 0;
       } else if (
         (posY > trial.optimal_time) &
         (posY < trial.canvas_size_target[0])
@@ -484,6 +486,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         new_score = trial.score + 1;
         // Drop speed is retained
         new_dropspeed = trial.dropspeed;
+        // Reset continuous mistakes
+        continous_mistakes = 0;
       } else if (posY >= trial.canvas_size_target[0]) {
         // SLOW ANSWER
         // The participant did not provide an answer before the target
@@ -495,6 +499,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Drop speed is slowed down
         new_dropspeed =
           trial.dropspeed + trial.dropspeed * trial.dropspeed_step_size;
+        // Increase continuous mistakes counter
+        continous_mistakes = continous_mistakes + 1;
       }
 
       // SHOW NEW SCORE
@@ -543,6 +549,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       } // END IF keyBoardListener
     }
     start_trial();
+
     // END TRIAL
     // End everything that might have been going on
     // Save data
@@ -559,12 +566,21 @@ jsPsych.plugins["canvas-keys"] = (function () {
       // Show feedback
       show_feedback();
 
-      // Last RT
+      // CHECK: Inattentiveness
+      // Stop the experiment if they are not actively engaging
+      if (continous_mistakes > 3) {
+        // Stops the current trials and remaining loops
+        jsPsych.endCurrentTimeline();
+      }
+
+      // SAVE DATA
+      // get Last RT
       if (all_responses.length === 0) {
         var last_RT = 0;
       } else {
         var last_RT = all_responses.pop().rt;
       }
+
       // End trial after showing the feedback for a few milliseconds
       jsPsych.pluginAPI.setTimeout(function () {
         // clear the display
@@ -587,6 +603,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
           RT_ms: last_RT,
           // Whether the response was fast, optimal, or slow
           speed_category: answer_speed,
+          // Number of continues too slow ansers
+          continous_mistakes: continous_mistakes,
           // Dropspeed with which the target moved across the canvas
           dropspeed: trial.dropspeed,
           // Adjusted dropspeed - dependent on speed_category

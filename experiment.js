@@ -17,7 +17,7 @@ var initialize_experiment = {
   func: function () {},
   // Save the required data that is fed into the first trial.
   data: {
-    new_dropspeed: 1000,
+    new_dropspeed: 100,
     new_score: 1,
     data_type: "initialize",
   },
@@ -214,6 +214,7 @@ var instructions_start = {
 
 // TIMELINE: EXPERIMENT
 var loop_counter = 1; // set global variable
+var continous_mistakes = 0; // set global variable
 
 var timeline_experiment = {
   // show the canvas-keyboard trials as defined above
@@ -281,6 +282,89 @@ function sampleStimuli(n_unique, n_loops, n_conditions) {
   return combined_trials;
 }
 
+// SCREEN: End of Experiment
+// Early End due to too many mistakes
+var EoE_mistakes = {
+  type: "instructions",
+  // Show buttons for clicking
+  show_clickable_nav: false,
+  // Show the amount of pages left
+  show_page_number: false,
+  // Also allow forwarding by keyboard
+  key_forward: "Enter",
+  // Add information for easy data processing
+  data: { data_type: "end-of-experiment" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    // Create as function so that the context is retrieved upon presentation
+    function () {
+      var text =
+        "<p> <b> You have reached the end of the <i> Free Association Game </i></b><br>" +
+        "Thank you for participating! <br> <br>" +
+        "Unfortunately you made " +
+        continous_mistakes +
+        " mistakes in a row. <br>" +
+        "Please let us know if you were experiencing technical difficulties, " +
+        "<br> did not understand the task, <br> " +
+        "or where having other issues. <br><br>" +
+        "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
+        "<br> <br> <i> You can now close this screen. <i>";
+
+      return text;
+    },
+  ],
+  conditional_function: function () {
+    if (continous_mistakes > 3) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+};
+
+// Compute averages
+// SOURCE: https://jrsinclair.com/articles/2019/five-ways-to-average-with-js-reduce/
+function average(nums) {
+  return nums.reduce((a, b) => a + b) / nums.length;
+}
+
+var EoE_normal = {
+  type: "instructions", // Show buttons for clicking
+  show_clickable_nav: false,
+  // Show the amount of pages left
+  show_page_number: false,
+  // Also allow forwarding by keyboard
+  key_forward: "Enter",
+  // Add information for easy data processing
+  data: { data_type: "end-of-experiment" },
+  // Individual pages / slides with HTML markup
+  pages: [
+    // Create as function so that the context is retrieved upon presentation
+    function () {
+      var text =
+        "<p> <b> You have reached the end of the <i> Free Association Game </i></b><br>" +
+        "Thank you for participating! <br> <br>" +
+        "<div style = 'text-align: left;'>" + // align text left for pretty list.
+        "<p> 1. You scored " +
+        jsPsych.data.get().last(1).values()[0].new_score +
+        " / " +
+        jsPsych.data.get().last(1).values()[0].total_trials +
+        " points." +
+        "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
+        "<br> <br> <i> You can now close this screen. <i>";
+
+      return text;
+    },
+  ],
+  conditional_function: function () {
+    if (continous_mistakes > 3) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+};
+
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
@@ -308,7 +392,9 @@ timeline.push(
   instructions_start,
   */
   initialize_experiment, // set adaptive parameters
-  timeline_experiment
+  timeline_experiment,
+  // End of Experiment
+  EoE_mistakes
 );
 
 // INITIALIZE EXPERIMENT
