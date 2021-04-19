@@ -664,6 +664,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         jsPsych.endCurrentTimeline();
       }
 
+      console.log("continuous_mistakes: " + continous_mistakes);
+
       // SAVE DATA
       // get Last RT
       if (all_responses.length === 0) {

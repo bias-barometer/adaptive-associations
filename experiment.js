@@ -221,7 +221,6 @@ var instructions_start = {
 
 // TIMELINE: EXPERIMENT
 var loop_counter = 1; // set global variable
-var continous_mistakes = 0; // set global variable
 
 var timeline_experiment = {
   // show the canvas-keyboard trials as defined above
@@ -290,6 +289,8 @@ function sampleStimuli(n_unique, n_loops, n_conditions) {
 }
 
 // SCREEN: End of Experiment
+var continous_mistakes = 0; // set global variable
+
 // Early End due to too many mistakes
 var EoE_mistakes = {
   type: "instructions",
@@ -313,13 +314,18 @@ var EoE_mistakes = {
         " mistakes in a row. <br>" +
         "Please let us know if you were experiencing technical difficulties, " +
         "<br> did not understand the task, <br> " +
-        "or where having other issues. <br><br>" +
+        "or where having other issues. " +
+        "<br><br>" +
         "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
         "<br> <br> <i> You can now close this screen. <i>";
 
       return text;
     },
   ],
+};
+
+var timeline_EoE_mistakes = {
+  timeline: [EoE_mistakes],
   conditional_function: function () {
     if (continous_mistakes > 3) {
       return true;
@@ -328,12 +334,6 @@ var EoE_mistakes = {
     }
   },
 };
-
-// Compute averages
-// SOURCE: https://jrsinclair.com/articles/2019/five-ways-to-average-with-js-reduce/
-function average(nums) {
-  return nums.reduce((a, b) => a + b) / nums.length;
-}
 
 var EoE_normal = {
   type: "instructions", // Show buttons for clicking
@@ -351,20 +351,25 @@ var EoE_normal = {
       var text =
         "<p> <b> You have reached the end of the <i> Free Association Game </i></b><br>" +
         "Thank you for participating! <br> <br>" +
-        "<div style = 'text-align: left;'>" + // align text left for pretty list.
-        "<p> 1. You scored " +
+        "<p>You scored " +
         jsPsych.data.get().last(1).values()[0].new_score +
         " / " +
         jsPsych.data.get().last(1).values()[0].total_trials +
         " points." +
+        "<br><br>" +
+        "Please get in touch if you have any remarks about the game. <br>" +
         "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
         "<br> <br> <i> You can now close this screen. <i>";
 
       return text;
     },
   ],
+};
+
+var timeline_EoE_normal = {
+  timeline: [EoE_normal],
   conditional_function: function () {
-    if (continous_mistakes < 3) {
+    if (continous_mistakes <= 3) {
       return true;
     } else {
       return false;
@@ -385,22 +390,25 @@ timeline.push(
   instructions,
   initialize_experiment, // set adaptive parameters
   timeline_instruction_trial,
-  // Second exposure (1 trial)
 
+  // Second exposure (1 trial)
   instructions_2,
   initialize_experiment, // set adaptive parameters
   timeline_instruction_trial,
+
   // Third exposure (5 trials)
   instructions_3,
   initialize_experiment, // set adaptive parameters
   timeline_practice,
+
   // The experiment
   instructions_start,
   initialize_experiment, // set adaptive parameters
   timeline_experiment,
-  // End of Experiment
-  EoE_mistakes,
-  EoE_normal
+
+  // End of Experiment feedback
+  timeline_EoE_mistakes,
+  timeline_EoE_normal
 );
 
 // INITIALIZE EXPERIMENT
@@ -414,10 +422,5 @@ jsPsych.init({
   exclusions: {
     min_width: 800,
     min_height: 600,
-  },
-  // DEBUG
-  // Show data on screen after finishing
-  on_finish: function () {
-    jsPsych.data.displayData();
   },
 });
