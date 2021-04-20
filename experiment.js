@@ -168,10 +168,10 @@ var instructions_3 = {
     "<p> Here are a few things to know before you get started: </p>",
     "<p> 1. Type the <b> first </b> word/association that comes to mind.",
     "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences).",
-    "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an').",
+    "<p> 3. A word consists of <b> more than 2 characters </b> (no 'a' or 'an').",
     "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
       "We check your answer to make sure it is <b> US English </b>",
-    "<p> 5. If you do <b> not</b> know the word type <b> xxx </b> as your answer.",
+    "<p> 5. If you do <b> not</b> know the target word type <b> xxx </b> as your answer.",
     "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer.",
     "<p> You'll now be able to practice with <b> 5 practice trials </b>",
   ],
@@ -209,10 +209,10 @@ var instructions_start = {
       "You are now ready to start the game: <br>" +
       "<p> 1. Type the <b> first </b> word/association that comes to mind." +
       "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences)." +
-      "<p> 3. A word consists of <b> 2 or more characters </b> (no 'a' or 'an')." +
+      "<p> 3. A word consists of <b> more than 2 characters </b> (no 'a' or 'an')." +
       "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
       "We check your answer to make sure it is <b> US English </b>" +
-      "<p> 5. If you do <b> not</b> know the word type <b> xxx </b> as your answer." +
+      "<p> 5. If you do <b> not</b> know the target word type <b> xxx </b> as your answer." +
       "<p> 6. Press the <b> Enter</b>-key to quickly submit your answer." +
       "<br><br> <i> Press the <b> Enter</b>-key to get started! </i>" +
       "</div>",
