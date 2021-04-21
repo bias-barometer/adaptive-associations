@@ -124,6 +124,16 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Defaults to the enter-key
         default: "Enter",
       },
+
+      max_continous_mistakes: {
+        description:
+          "Maximum number of continuous mistakes before the experiment is ended",
+        pretty_name: "max_continous_mistakes",
+        // Take an integer as input
+        type: jsPsych.plugins.parameterType.INT,
+        // Do not provide a default
+      },
+
       // FEEDBACK
       feedback_duration: {
         description: "Time in milliseconds for how long to show feedback.",
@@ -653,12 +663,10 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       // CHECK: Inattentiveness
       // Stop the experiment if they are not actively engaging
-      if (continous_mistakes > 3) {
+      if (continous_mistakes > max_continous_mistakes) {
         // Stops the current trials and remaining loops
         jsPsych.endCurrentTimeline();
       }
-
-      console.log("continuous_mistakes: " + continous_mistakes);
 
       // SAVE DATA
       // get Last RT

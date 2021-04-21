@@ -95,6 +95,9 @@ var trial = {
   response_keys: available_keys,
   // Which key participants can use to submit their answers
   end_key: "Enter",
+  // How many mistakes one is allowed to make after one another before
+  // ... being excluded from the experiment
+  max_continous_mistakes: 10,
 
   // FEEDBACK
   // Time in milliseconds how long to display the feedback for
@@ -239,7 +242,6 @@ var timeline_experiment = {
   loop_function: function () {
     // Desired number of repetitions
     if (loop_counter < 20) {
-      console.log("new_loop");
       loop_counter = loop_counter + 1; // increase loop counter to prevent infinite loop
       return true; // continues with the next loop
     } else {
@@ -328,7 +330,7 @@ var EoE_mistakes = {
 var timeline_EoE_mistakes = {
   timeline: [EoE_mistakes],
   conditional_function: function () {
-    if (continous_mistakes > 3) {
+    if (continous_mistakes > 10) {
       return true;
     } else {
       return false;
@@ -370,7 +372,7 @@ var EoE_normal = {
 var timeline_EoE_normal = {
   timeline: [EoE_normal],
   conditional_function: function () {
-    if (continous_mistakes <= 3) {
+    if (continous_mistakes <= 10) {
       return true;
     } else {
       return false;
