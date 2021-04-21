@@ -67,8 +67,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
         pretty_name: "dropspeed",
         // Takes an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        // Defaults to relatively slow
-        default: 500,
       },
 
       dropspeed_step_size: {
@@ -77,8 +75,6 @@ jsPsych.plugins["canvas-keys"] = (function () {
         pretty_name: "dropspeed_step_size",
         // Takes an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        // Defaults to relatively small changes
-        default: 0.1,
       },
 
       optimal_time: {
@@ -96,12 +92,10 @@ jsPsych.plugins["canvas-keys"] = (function () {
         pretty_name: "total_trials",
         // Take an integer as input
         type: jsPsych.plugins.parameterType.INT,
-        // Default to all score (N = 20),
-        default: 20,
       }, // END score
 
       score: {
-        description: "The number of score left in this trial to show on screen",
+        description: "The score in this trial to show on screen",
         pretty_name: "score",
         // Take an integer as input
         type: jsPsych.plugins.parameterType.INT,
@@ -567,8 +561,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
         // Reset continuous mistakes
         continous_mistakes = 0;
       } else if (
-        (posY > trial.optimal_time) &
-        (posY < trial.canvas_size_target[0])
+        ((posY > trial.optimal_time) & (posY < trial.canvas_size_target[0])) |
+        (posY == trial.optimal_time)
       ) {
         // OPTIMAL ANSWER
         // Store speed

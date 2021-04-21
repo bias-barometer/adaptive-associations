@@ -239,6 +239,7 @@ var timeline_experiment = {
   loop_function: function () {
     // Desired number of repetitions
     if (loop_counter < 20) {
+      console.log("new_loop");
       loop_counter = loop_counter + 1; // increase loop counter to prevent infinite loop
       return true; // continues with the next loop
     } else {
