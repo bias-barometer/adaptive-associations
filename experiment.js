@@ -380,11 +380,6 @@ var timeline_EoE_normal = {
 // COMPILE EXPERIMENT
 // (Required)
 // Add all screens to the timeline
-// timeline.push(informed_consent);
-// timeline.push(instructions);
-// timeline.push(timeline_practice);
-// timeline.push(instructions_start);
-// timeline.push(timeline_experiment);
 timeline.push(
   // First exposure (1 trial)
   instructions,
