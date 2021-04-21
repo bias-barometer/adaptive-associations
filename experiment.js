@@ -229,16 +229,16 @@ var timeline_experiment = {
   // NOTE: sourced from `stimuli.js`
   // NOTE: specify function below so that is called only once each experiment.
   timeline_variables: sampleStimuli(
-    (n_unique = 3),
-    (n_loops = 3),
-    (n_conditions = 2)
+    (n_unique = 10), // 10 jobtitles
+    (n_loops = 20), // 20 repetitions
+    (n_conditions = 2) // two valence conditions
   ), // number of stimulus words to sample
   // Present the trials in a random order
   randomize_order: true,
   // NOTE: A loop is always executed once, so reduce desired number of repetitions by 1
   loop_function: function () {
     // Desired number of repetitions
-    if (loop_counter < 3) {
+    if (loop_counter < 20) {
       loop_counter = loop_counter + 1; // increase loop counter to prevent infinite loop
       return true; // continues with the next loop
     } else {
