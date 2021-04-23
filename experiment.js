@@ -13,7 +13,7 @@ var n_loops_total = 1;
 // Keep track of number of exectuted loops
 var loop_counter = 1; // initialize - DO NOT CHANGE
 // Number of Continuous Mistakes allowed before being excluded from the experiment
-var continous_mistakes = 0; // set global variable
+var continous_mistakes = 0; // initialize - DO NOT CHANGE
 
 // UvA LAB parameters
 // SOURCE: https://www.lab.uva.nl/lab/recruitment/pages/questionnaire_link_support
@@ -55,7 +55,7 @@ var instructions = {
   // Show buttons for clicking
   show_clickable_nav: true,
   // Show the amount of pages left
-  show_page_number: true,
+  show_page_number: false,
   // Also allow forwarding by keyboard
   key_forward: "Enter",
   // Text on buttons
@@ -164,8 +164,9 @@ var instructions_2 = {
       "It indicates that you should give a <span style = 'color: rgba(0, 158, 115, 1)'> positive </span> association (e.g. 'Sweet').",
     "<p> If 'Chocolate' is shown in <span style = 'color: rgba(213, 94, 0, 1)'>red</span> we want you to give a " +
       "<span style = 'color: rgba(213, 94, 0, 1)'> negative </span> association (e.g., 'Unhealthy').",
-    "<p> Your <b> current score </b> is shown by the number and the yellow bar." +
-      "<br> In this example you had 1 point (yellow) but the maximum score (grey) was 2 points.",
+    "<p> Your <b> current score </b> is shown by the number and the <span style = 'color: rgba(255, 208, 0, 1)'>yellow bar</span>." +
+      "<br> In this example you had 1 point (<span style = 'color: rgba(255, 208, 0, 1)'>yellow</span>) but " +
+      "the maximum score (<span style = 'color: rgba(238, 238, 238, 1)'>grey</span>) was 2 points.",
     "<p> If you type a response <b> before </b> the target ('Chocolate') hits the bottom, you'll <b> gain </b> a point. <br>" +
       "<p> If you're too late you'll lose a point. ",
     "<p> Achieving the maximum score is not easy: <br>" +
@@ -344,7 +345,7 @@ var EoE_mistakes = {
         "or where having other issues. " +
         "<br><br>" +
         "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
-        "<br> <br> <i> You can now close this screen. <i>";
+        "<br> <br> <i> Press the <b> Enter</b>-key to return to the Lab-page <i>";
 
       return text;
     },
@@ -386,7 +387,7 @@ var EoE_normal = {
         "<br><br>" +
         "Please get in touch if you have any remarks about the game. <br>" +
         "You can contact us via <b> s.a.m.hogenboom@uva.nl </b>" +
-        "<br> <br> <i> You can now close this screen. <i>";
+        "<br> <br> <i> Press the <b> Enter</b>-key to return to the Lab-page <i>";
 
       return text;
     },

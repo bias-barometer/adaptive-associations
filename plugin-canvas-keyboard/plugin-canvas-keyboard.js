@@ -663,7 +663,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
       // CHECK: Inattentiveness
       // Stop the experiment if they are not actively engaging
-      if (continous_mistakes > max_continous_mistakes) {
+      if (continous_mistakes > trial.max_continous_mistakes) {
         // Stops the current trials and remaining loops
         jsPsych.endCurrentTimeline();
       }
