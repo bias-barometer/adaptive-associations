@@ -8,6 +8,32 @@
 // SET-UP
 // Initialize timeline variable (required)
 var timeline = [];
+// Total number of times to present each selected stimulus
+var n_loops_total = 1;
+// Keep track of number of exectuted loops
+var loop_counter = 1; // initialize - DO NOT CHANGE
+// Number of Continuous Mistakes allowed before being excluded from the experiment
+var continous_mistakes = 0; // set global variable
+
+// UvA LAB parameters
+// SOURCE: https://www.lab.uva.nl/lab/recruitment/pages/questionnaire_link_support
+function getUrlVars() {
+  let vars = {};
+  window.location.href.replace(
+    /[?&]+([^=&]+)=([^&]*)/gi,
+    function (m, key, value) {
+      vars[key] = value;
+    }
+  );
+
+  // vars contains all query parameters  e.g.
+  // console.log(vars['tid']);
+  // console.log(vars['uvanetid']); // equal to userid
+  // console.log(vars['userid']);
+  // console.log(vars['username']);
+  return vars;
+}
+let labParameters = getUrlVars();
 
 // Initialize variables that are re-used flexibly within trials
 var initialize_experiment = {
@@ -40,6 +66,7 @@ var instructions = {
   // Individual pages / slides with HTML markup
   pages: [
     //
+    "<p> Welcome to the Free Association Game",
     "<p> Let's have a look at the playing field <i>(you won't have to do anything)</i>. <br> We'll explain what you see after.",
   ],
 };
@@ -223,8 +250,6 @@ var instructions_start = {
 };
 
 // TIMELINE: EXPERIMENT
-var loop_counter = 1; // set global variable
-
 var timeline_experiment = {
   // show the canvas-keyboard trials as defined above
   timeline: [trial],
@@ -233,7 +258,7 @@ var timeline_experiment = {
   // NOTE: specify function below so that is called only once each experiment.
   timeline_variables: sampleStimuli(
     (n_unique = 10), // 10 jobtitles
-    (n_loops = 20), // 20 repetitions
+    (n_loops = n_loops_total), // 20 repetitions
     (n_conditions = 2) // two valence conditions
   ), // number of stimulus words to sample
   // Present the trials in a random order
@@ -241,7 +266,7 @@ var timeline_experiment = {
   // NOTE: A loop is always executed once, so reduce desired number of repetitions by 1
   loop_function: function () {
     // Desired number of repetitions
-    if (loop_counter < 20) {
+    if (loop_counter < n_loops_total) {
       loop_counter = loop_counter + 1; // increase loop counter to prevent infinite loop
       return true; // continues with the next loop
     } else {
@@ -292,7 +317,6 @@ function sampleStimuli(n_unique, n_loops, n_conditions) {
 }
 
 // SCREEN: End of Experiment
-var continous_mistakes = 0; // set global variable
 
 // Early End due to too many mistakes
 var EoE_mistakes = {
@@ -420,5 +444,11 @@ jsPsych.init({
   exclusions: {
     min_width: 800,
     min_height: 600,
+  },
+  // Refer back to UvA Lab website
+  on_finish: function () {
+    window.location =
+      "https://www.lab.uva.nl/lab/index.php/projects/end_online_project/" +
+      labParameters["tid"];
   },
 });
