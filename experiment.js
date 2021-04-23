@@ -380,7 +380,10 @@ var EoE_normal = {
         "<p> <b> You have reached the end of the <i> Free Association Game </i></b><br>" +
         "Thank you for participating! <br> <br>" +
         "<p>You scored " +
-        jsPsych.data.get().last(1).values()[0].new_score +
+        Math.min(
+          jsPsych.data.get().last(1).values()[0].new_score,
+          jsPsych.data.get().last(1).values()[0].total_trials
+        ) +
         " / " +
         jsPsych.data.get().last(1).values()[0].total_trials +
         " points." +
