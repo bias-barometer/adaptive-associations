@@ -15,26 +15,6 @@ var loop_counter = 1; // initialize - DO NOT CHANGE
 // Number of Continuous Mistakes allowed before being excluded from the experiment
 var continous_mistakes = 0; // initialize - DO NOT CHANGE
 
-// UvA LAB parameters
-// SOURCE: https://www.lab.uva.nl/lab/recruitment/pages/questionnaire_link_support
-function getUrlVars() {
-  let vars = {};
-  window.location.href.replace(
-    /[?&]+([^=&]+)=([^&]*)/gi,
-    function (m, key, value) {
-      vars[key] = value;
-    }
-  );
-
-  // vars contains all query parameters  e.g.
-  // console.log(vars['tid']);
-  // console.log(vars['uvanetid']); // equal to userid
-  // console.log(vars['userid']);
-  // console.log(vars['username']);
-  return vars;
-}
-let labParameters = getUrlVars();
-
 // Initialize variables that are re-used flexibly within trials
 var initialize_experiment = {
   // Basicly an empty function that is called but does not show anything on screen
@@ -448,11 +428,5 @@ jsPsych.init({
   exclusions: {
     min_width: 800,
     min_height: 600,
-  },
-  // Refer back to UvA Lab website
-  on_finish: function () {
-    window.location =
-      "https://www.lab.uva.nl/lab/index.php/projects/end_online_project/" +
-      labParameters["tid"];
   },
 });
