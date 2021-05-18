@@ -593,7 +593,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         new_score = Math.max(trial.score - 1, 0);
         // Drop speed is slowed down (larger increments)
         new_dropspeed =
-          trial.dropspeed + trial.dropspeed * (2 * trial.dropspeed_step_size);
+          trial.dropspeed + trial.dropspeed * (3 * trial.dropspeed_step_size);
         // Increase continuous mistakes counter
         continous_mistakes = continous_mistakes + 1;
       }
