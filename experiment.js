@@ -178,7 +178,7 @@ var instructions_3 = {
     "<p> Good effort!",
     "<p> Here are a few things to know before you get started: </p>",
     "<p> 1. Type the <b> first </b> word/association that comes to mind.",
-    "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences).",
+    "<p> 2. You can only type <b> 1 word </b> (no sentences).",
     "<p> 3. A word consists of <b> more than 2 characters </b> (no 'a' or 'an').",
     "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
       "We check your answer to make sure it is <b> US English </b>",
@@ -219,7 +219,7 @@ var instructions_start = {
     "<div style = 'text-align: left;'>" + // align text left for pretty list.
       "You are now ready to start the game: <br>" +
       "<p> 1. Type the <b> first </b> word/association that comes to mind." +
-      "<p> 2. You can only type <b> 1 or 2 words </b> (no sentences)." +
+      "<p> 2. You can only type <b> 1 word </b> (no sentences)." +
       "<p> 3. A word consists of <b> more than 2 characters </b> (no 'a' or 'an')." +
       "<p> 4. Be quick, but type actual words; use <b> backspace </b> to correct any mistakes. <br>" +
       "We check your answer to make sure it is <b> US English </b>" +

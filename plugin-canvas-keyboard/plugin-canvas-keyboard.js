@@ -240,7 +240,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       feedback_html =
         "<div id='html-feedback'>" +
         "A <span id='validity'> valid </span> responses contains " +
-        "<span id='n_words'> 1 or 2 words </span> " +
+        "<span id='n_words'> 1 word </span> " +
         "in <span id='us_english'> US English </span> " +
         "with more than <span id='n_characters'> 2 characters. </span>" +
         "</div>";
@@ -405,7 +405,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
 
     /* // Show feedback in the form of color coded text (included in feedback_html)
         "A <span id='validity'> valid </span> responses contains " +
-        "<span id='n_words'> 1 or 2 </span> " +
+        "<span id='n_words'> 1 Word in </span> " +
         "<span id='us_english'> US English </span> words with at least " +
         "<span id='n_characters'> 3 characters</span>.";*/
 
@@ -434,7 +434,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
       } else {
         var n_words = answer.split(" ").length;
 
-        if ((n_words == 1) | (n_words == 2)) {
+        if (n_words == 1) {
           document.getElementById("n_words").style.color = valid;
         } else {
           document.getElementById("n_words").style.color = invalid;
