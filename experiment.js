@@ -429,4 +429,9 @@ jsPsych.init({
     min_width: 800,
     min_height: 600,
   },
+  /*
+  on_finish: function () {
+    jsPsych.data.displayData("csv");
+  },
+  */
 });

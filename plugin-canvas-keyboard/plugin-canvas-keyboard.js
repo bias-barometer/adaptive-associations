@@ -411,7 +411,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
         "<span id='n_characters'> 3 characters</span>.";*/
 
     function validate_response() {
-      var valid_answer = true;
+      valid_answer = true;
 
       // SET COLORS
       var invalid = "rgba(213, 94, 0, 1)"; // red
