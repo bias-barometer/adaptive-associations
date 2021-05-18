@@ -180,6 +180,7 @@ jsPsych.plugins["canvas-keys"] = (function () {
     var answer_speed = "";
     var new_score = null;
     var new_dropspeed = null;
+    var valid_answer = null;
 
     // CREATE SCREENS
     // The jsPsych styling sheet ensures that all elements (within "display_element") are centered on screen.
@@ -714,6 +715,8 @@ jsPsych.plugins["canvas-keys"] = (function () {
           association: visible_responses.join(""),
           // Each keystroke including timing
           key_responses: JSON.stringify(all_responses),
+          // Was the answer valid
+          valid_answer: valid_answer,
           // Keep track of actions outside the experiment window - for exclusion
           interactions: jsPsych.data.getInteractionData().json(),
         };
