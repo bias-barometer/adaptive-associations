@@ -1,0 +1,70 @@
+/* INSTRUCTIONS */
+/* Reposition instructions navigation bar */
+/* NOTE: remove intag styling from jspsych-instructions.js*/
+.jspsych-instructions-nav {
+  padding-top: 100px;
+}
+
+#html-continue {
+  padding-top: 14px;
+  font-size: 14px;
+}
+
+/* TARGET */
+#canvas-target {
+  border: 2px solid #000000;
+}
+
+/* RESPONSE */
+/* increase font size of response */
+#html-response {
+  font-size: 30px;
+  padding: 20px 0px;
+}
+
+/* SCORE */
+/* Adapted from jspsych.css progress bar */
+
+/* Size of the div element where all other elements are included */
+#score-container {
+  text-align: center;
+  width: 100%;
+}
+
+/* The score are displayed as a number; padding ensures space between
+text and bar */
+#score-text {
+  font-size: 18px; /* like all other text components */
+  font-family: "Open Sans", "Arial", sans-serif;
+  vertical-align: top;
+  text-align: center;
+  height: 100%;
+  width: 10%;
+  display: inline-block;
+}
+
+/* Visualization of the empty bar (i.e., max score) */
+#score-background {
+  background-color: #eee;
+  width: 90%;
+  height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* colored bar to indicate the current score */
+#score {
+  background-color: rgb(255, 208, 0);
+  /*width: 100%;*/
+  height: 100%;
+}
+
+/* FEEDBACK */
+span {
+  font-weight: bold;
+}
+
+#html-feedback {
+  font-size: 14px;
+}
